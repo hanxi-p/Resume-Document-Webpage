@@ -1289,23 +1289,22 @@
             resumeAccessGate.hidden = true;
             resumeFrame.hidden = false;
             resumeFrameFooter.hidden = false;
-            if (!resumeFrame.src || resumeFrame.src === 'about:blank') {
-                resumeFrame.src = `jianli.html?v=${Date.now()}`;
-            }
+            resumeFrame.src = `jianli.html?v=${Date.now()}`;
         }
 
-        async function prepareResumeAccess() {
-            if (resumeUnlocked) return;
-            try {
-                const response = await fetch('/api/resume-auth', { credentials: 'same-origin' });
-                if (response.ok) {
-                    showUnlockedResume();
-                    return;
-                }
-            } catch (_) { /* 保留密码输入界面 */ }
+        function resetResumeAccess() {
+            resumeUnlocked = false;
             resumeAccessGate.hidden = false;
             resumeFrame.hidden = true;
             resumeFrameFooter.hidden = true;
+            resumeFrame.src = 'about:blank';
+            resumeFrame.style.height = '0px';
+            resumeAccessPassword.value = '';
+            resumeAccessStatus.textContent = '';
+        }
+
+        function prepareResumeAccess() {
+            resetResumeAccess();
             window.requestAnimationFrame(() => resumeAccessPassword?.focus());
         }
 
@@ -1323,6 +1322,10 @@
                 });
                 if (!response.ok) {
                     const payload = await response.json().catch(() => ({}));
+                    if (response.status === 429) {
+                        window.location.reload();
+                        return;
+                    }
                     resumeAccessStatus.textContent = payload.detail || '密码错误，请重试';
                     resumeAccessPassword.select();
                     return;
@@ -1364,7 +1367,10 @@
                 a.classList.toggle('active', a.dataset.view === viewName);
             });
             // 切回首页时显示导航栏
-            if (viewName === 'home') document.querySelector('.navbar').classList.remove('hidden');
+            if (viewName === 'home') {
+                document.querySelector('.navbar').classList.remove('hidden');
+                resetResumeAccess();
+            }
             if (viewName === 'resume') prepareResumeAccess();
             window.requestAnimationFrame(fitResumeForViewport);
             window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -7,9 +7,11 @@
 - 四张背景图自动轮播；手机端不显示圆点和左右按钮
 - 研究方向采用两列卡片，可从文本文件维护内容
 - 点击头像复制邮箱，桌面端悬停显示联系气泡
-- 简历使用服务器端密码验证，口令不会写入前端源码
+- 密码使用 PBKDF2-SHA256、随机盐和 600,000 次迭代保存，不存储明文
+- 每次重新打开简历都必须再次输入密码；访问凭证仅供一次简历请求使用
+- 同一 IP 在 24 小时内连续输错 5 次后，整个网站对该 IP 锁定 24 小时
 - 简历保持两张 A4 版式；手机端按整页比例缩放，打印调用浏览器原生 A4 打印逻辑
-- 返回首页和打印按钮以悬浮胶囊样式显示在简历末尾
+- 返回首页和打印按钮分别显示在简历左下角和右下角
 - FastAPI 提供静态页面与健康检查接口
 
 ## 本地运行
@@ -19,14 +21,22 @@ python -m pip install -r backend/requirements.txt
 backend/start-fastapi.bat
 ```
 
-设置简历访问密码后再启动服务：
+首次启动前，交互式设置密码哈希：
 
 ```powershell
-$env:RESUME_ACCESS_CODE = "请替换为自己的密码"
+python backend/security_admin.py set-password
 backend/start-fastapi.bat
 ```
 
-也可以把密码单独写入 `backend/.resume_access_code`。该文件已加入 `.gitignore`，请勿提交。然后打开 `http://127.0.0.1:8000/`。
+脚本只写入 `backend/.resume_access_hash`，不会保存明文密码。哈希文件和封禁数据库均已加入 `.gitignore`。然后打开 `http://127.0.0.1:8000/`。
+
+如果需要解除某个 IP 的封禁或错误计数：
+
+```powershell
+python backend/security_admin.py unblock 192.0.2.10
+```
+
+使用 `unblock --all` 可以清除全部封禁和错误计数。公开部署时建议通过 HTTPS 提供服务。
 
 ## 自定义
 
