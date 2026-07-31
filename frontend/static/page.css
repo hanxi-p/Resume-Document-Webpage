@@ -1,0 +1,221 @@
+/* ── 技术专题页公共样式 ── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg-dark: #07111f;
+    --card-bg: rgba(12, 22, 36, 0.72);
+    --text-main: #f5f7fb;
+    --text-sub: rgba(245, 247, 251, 0.72);
+    --accent: #d9a441;
+    --accent-dim: rgba(217, 164, 65, 0.15);
+    --border: rgba(255, 255, 255, 0.10);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    line-height: 1.7;
+}
+
+/* ── 固定背景 ── */
+.page-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(24, 42, 62, 0.50), transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(8, 18, 32, 0.60), transparent 50%),
+                linear-gradient(180deg, #07111f 0%, #0a1a2e 100%);
+}
+
+/* ── 导航 ── */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(5, 12, 22, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.navbar .logo {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text-main);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+.navbar nav {
+    display: flex;
+    gap: 1.8rem;
+    align-items: center;
+}
+.navbar nav a {
+    color: var(--text-sub);
+    text-decoration: none;
+    font-size: 0.92rem;
+    transition: color .2s;
+}
+.navbar nav a:hover { color: var(--text-main); }
+.navbar nav a.active {
+    color: var(--text-main);
+    font-weight: 600;
+    position: relative;
+}
+.navbar nav a.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -8px;
+    height: 2px;
+    border-radius: 99px;
+    background: var(--accent);
+}
+
+/* ── 页面头部 ── */
+.page-header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 7rem 2rem 3rem;
+}
+.page-header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.6rem;
+}
+.page-header .en-title {
+    color: var(--accent);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.8rem;
+}
+.page-header .divider {
+    width: 60px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 99px;
+    margin: 1rem auto;
+}
+.page-header .summary {
+    max-width: 700px;
+    margin: 1rem auto 0;
+    color: var(--text-sub);
+    font-size: 0.98rem;
+}
+
+/* ── 内容容器 ── */
+.content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem 5rem;
+}
+
+/* ── 内容卡片 ── */
+.section-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem 2.4rem;
+    margin-bottom: 1.8rem;
+    transition: border-color .2s;
+}
+.section-card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.section-card h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.section-card h2 .icon {
+    color: var(--accent);
+    font-size: 1.3rem;
+}
+.section-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 1.4rem 0 0.6rem;
+}
+.section-card h3:first-of-type { margin-top: 0; }
+.section-card p {
+    color: var(--text-sub);
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+.section-card p:last-child { margin-bottom: 0; }
+.section-card ul, .section-card ol {
+    color: var(--text-sub);
+    padding-left: 1.4rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+.section-card ul li, .section-card ol li { margin-bottom: 0.35rem; }
+.section-card .tag {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 0.78rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 99px;
+    margin: 0.2rem 0.2rem;
+    border: 1px solid rgba(217, 164, 65, 0.2);
+}
+
+/* ── 公式/代码块 ── */
+.section-card .math {
+    background: rgba(0,0,0,0.3);
+    border-left: 3px solid var(--accent);
+    padding: 0.8rem 1.2rem;
+    margin: 0.8rem 0;
+    border-radius: 0 8px 8px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    overflow-x: auto;
+}
+
+/* ── 返回链接 ── */
+.back-link {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding-bottom: 4rem;
+}
+.back-link a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.92rem;
+    transition: opacity .2s;
+}
+.back-link a:hover { opacity: 0.8; }
+
+/* ── 响应式 ── */
+@media (max-width: 600px) {
+    .navbar { padding: 0 1rem; height: 56px; }
+    .navbar nav { gap: 1rem; }
+    .page-header { padding: 5.5rem 1rem 2rem; }
+    .page-header h1 { font-size: 1.8rem; }
+    .content { padding: 0 1rem 3rem; }
+    .section-card { padding: 1.4rem 1.2rem; }
+}

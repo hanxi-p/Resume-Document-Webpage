@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.bak
+*.log
+Thumbs.db
+.DS_Store
+.env
+.venv/
+venv/
+ssh.pem
+*.key
+*.pem

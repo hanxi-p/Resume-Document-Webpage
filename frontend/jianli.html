@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>个人简历 - 石油工程硕士</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-y: scroll; }
+
+    @import url('https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5/index.css');
+
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      animation: pageIn 0.35s ease;
+    }
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+    }
+    .hero-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-bg .overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, rgba(24, 42, 62, 0.50), rgba(0, 0, 0, 0.45)),
+        linear-gradient(120deg, rgba(8, 18, 32, 0.40), rgba(0, 0, 0, 0.55));
+    }
+
+    /* ── 导航 ── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 0 2rem;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.25);
+    }
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .nav-badge {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      opacity: 0.82;
+      flex-shrink: 0;
+      filter: grayscale(0.1);
+      pointer-events: none;
+    }
+    .navbar .motto {
+      font-family: 'Ma Shan Zheng', 'STXingkai', 'KaiTi', cursive;
+      font-size: 1.6rem;
+      color: #d9a441;
+      text-shadow: 0 0 16px rgba(217, 164, 65, 0.3);
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+      display: inline-flex;
+      column-gap: 0.35em;
+    }
+    .navbar nav {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      align-self: center;
+      margin-top: 8px;
+    }
+    .navbar nav a {
+      color: rgba(245, 247, 251, 0.72);
+      text-decoration: none;
+      font-size: 1.2rem;
+      transition: color .2s;
+      font-weight: 500;
+    }
+    .navbar nav a:hover { color: #f5f7fb; }
+    .navbar nav a.active {
+      color: #f5f7fb;
+      font-weight: 700;
+      position: relative;
+    }
+    .navbar nav a.active::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      bottom: -10px;
+      height: 2px;
+      border-radius: 99px;
+      background: #d9a441;
+    }
+
+    /* ── 简历正文（使用模板内容） ── */
+    .resume {
+      max-width: 900px;
+      margin: 110px auto 40px;
+      background: #fff;
+      padding: 44px 56px;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      border-bottom: 3px solid #1f4e79;
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+    }
+    .name {
+      font-size: 34px;
+      font-weight: 700;
+      color: #1f4e79;
+      margin: 0 0 8px;
+      letter-spacing: 2px;
+    }
+    .title {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .contact {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .section { margin-bottom: 26px; }
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f4e79;
+      border-left: 5px solid #1f4e79;
+      padding-left: 12px;
+      margin-bottom: 14px;
+    }
+    .item { margin-bottom: 16px; }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      font-weight: 700;
+      color: #222;
+    }
+    .item-subtitle { color: #666; margin: 3px 0 6px; }
+    ul { margin: 8px 0 0 20px; padding: 0; }
+    li { margin-bottom: 6px; }
+    .skills {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 24px;
+    }
+    .skill-box {
+      background: #f5f8fb;
+      border: 1px solid #dce7f2;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .placeholder { color: #777; }
+    .back-link {
+      display: inline-block; margin-top: 0;
+      color: #666; text-decoration: none; font-size: 1rem; font-weight: 600;
+    }
+    .back-link:hover { color: #1f4e79; }
+    .resume-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+    .print-btn {
+      background: none;
+      border: none;
+      color: #666;
+      padding: 0;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: color .2s;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .print-btn:hover {
+      color: #1f4e79;
+    }
+
+    @media print {
+      @page { margin: 15mm 18mm; }
+      body { background: #fff; }
+      .navbar, .hero-bg, .print-btn, .back-link { display: none !important; }
+      .resume { margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
+      .resume-footer { display: none !important; }
+      .resume .section, .resume .item, .resume .header, .resume .skills, .resume .skill-box { page-break-inside: avoid; break-inside: avoid; }
+    }
+
+    @media (max-width: 700px) {
+      .navbar { padding: 0 1rem; height: 64px; min-height: unset; align-items: center; background: linear-gradient(135deg, #0d1b2a, #1a3a5c); backdrop-filter: blur(12px); }
+      .navbar nav { gap: 1rem; }
+      .navbar nav a { font-size: 1.08rem; }
+      .nav-badge { width: 64px; height: 64px; }
+      .navbar .motto { font-size: 0.96rem; display: inline-flex; flex-direction: column; line-height: 1.3; letter-spacing: 0.04em; margin-left: 0.8rem; }
+      .nav-left { gap: 0.5rem; align-items: center; }
+      .resume-stage {
+        position: relative;
+        width: 100%;
+        margin-top: 80px;
+        overflow: hidden;
+      }
+      .resume-stage .resume {
+        width: 900px;
+        max-width: none;
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform-origin: top left;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero-bg">
+    <img src="static/756.jpg" alt="">
+    <div class="overlay"></div>
+  </div>
+
+  <header class="navbar">
+    <div class="nav-left">
+      <img src="static/logo-placeholder.svg" alt="站点标志" class="nav-badge">
+      <span class="motto"><span>个人简历</span><span>作品展示</span></span>
+    </div>
+    <nav>
+      <a href="/">首页</a>
+      <a href="jianli.html" class="active">简历</a>
+      <a href="https://github.com/yourname" target="_blank">GitHub</a>
+    </nav>
+  </header>
+
+  <div class="resume-stage">
+  <main class="resume">
+    <header class="header">
+      <h1 class="name">姓名</h1>
+      <div class="title">石油工程硕士｜求职意向：油藏工程 / 钻完井工程 / 生产工程 / 能源技术相关岗位</div>
+      <div class="contact">
+        手机：138-0000-0000 ｜ 邮箱：hello@example.com ｜ 城市：填写城市 ｜ LinkedIn/个人主页：填写链接
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="section-title">个人简介</div>
+      <p>
+        石油工程硕士，具备油藏工程、钻井工程、采油工程及油气田开发相关专业背景。
+        熟悉油气藏评价、生产动态分析、数值模拟、井筒与地层流动基础理论，具备较强的数据分析、工程建模和技术报告撰写能力。
+        期望在能源、油气开发、工程技术或相关咨询岗位中发挥专业优势。
+      </p>
+    </section>
+
+    <section class="section">
+      <div class="section-title">教育背景</div>
+      <div class="item">
+        <div class="item-header">
+          <span>学校名称｜石油工程｜硕士</span>
+          <span class="placeholder">20XX.XX - 20XX.XX</span>
+        </div>
+        <div class="item-subtitle">研究方向：油藏工程 / 钻完井工程 / 提高采收率 / 非常规油气开发（按实际填写）</div>
+        <ul>
+          <li>主修课程：油藏工程、高等渗流力学、钻井工程、采油工程、油气田开发地质、油藏数值模拟等。</li>
+          <li>硕士论文：填写论文题目或研究课题。</li>
+        </ul>
+      </div>
+
+      <div class="item">
+        <div class="item-header">
+          <span>学校名称｜专业名称｜本科</span>
+          <span class="placeholder">20XX.XX - 20XX.XX</span>
+        </div>
+        <div class="item-subtitle">可填写绩点、排名、奖学金或相关荣誉。</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">科研 / 项目经历</div>
+      <div class="item">
+        <div class="item-header">
+          <span>项目名称：填写项目名称</span>
+          <span class="placeholder">20XX.XX - 20XX.XX</span>
+        </div>
+        <div class="item-subtitle">角色：项目成员 / 负责人 / 研究助理</div>
+        <ul>
+          <li>围绕油藏开发、产能评价、注采优化或提高采收率等方向开展研究与分析。</li>
+          <li>负责数据整理、模型建立、参数敏感性分析、结果可视化及技术报告撰写。</li>
+          <li>使用 Eclipse / CMG / Petrel / MATLAB / Python / Excel 等工具完成相关工作（按实际修改）。</li>
+        </ul>
+      </div>
+
+      <div class="item">
+        <div class="item-header">
+          <span>项目名称：填写项目名称</span>
+          <span class="placeholder">20XX.XX - 20XX.XX</span>
+        </div>
+        <ul>
+          <li>填写项目背景、个人职责、使用方法和最终成果。</li>
+          <li>建议突出量化结果，例如"模型误差降低 XX%""完成 XX 口井生产动态分析"。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">实习 / 工作经历</div>
+      <div class="item">
+        <div class="item-header">
+          <span>公司名称｜岗位名称</span>
+          <span class="placeholder">20XX.XX - 20XX.XX</span>
+        </div>
+        <ul>
+          <li>参与油气田开发方案、生产数据分析、现场资料整理或工程技术支持工作。</li>
+          <li>协助完成日报、月报、技术总结或汇报材料，提升跨部门沟通与工程问题分析能力。</li>
+          <li>填写与目标岗位最相关的成果和贡献。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">专业技能</div>
+      <div class="skills">
+        <div class="skill-box"><strong>专业方向：</strong>油藏工程、钻井工程、采油工程、油气田开发</div>
+        <div class="skill-box"><strong>软件工具：</strong>Eclipse / CMG / Petrel / MATLAB / Python / Excel</div>
+        <div class="skill-box"><strong>数据分析：</strong>生产动态分析、参数拟合、图表可视化、技术报告</div>
+        <div class="skill-box"><strong>语言能力：</strong>中文母语，英语 CET-6 / IELTS / TOEFL（按实际填写）</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">论文 / 证书 / 荣誉</div>
+      <ul>
+        <li>论文：填写论文题目、期刊 / 会议名称、作者顺序、发表时间。</li>
+        <li>证书：填写英语证书、计算机证书、专业软件培训证书等。</li>
+        <li>荣誉：填写奖学金、优秀学生、竞赛获奖等。</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <div class="section-title">自我评价</div>
+      <p>
+        具备扎实的石油工程专业基础和较强的学习能力，能够快速理解工程问题并进行系统分析。
+        做事认真负责，注重数据准确性和结果表达，具备良好的团队协作、沟通汇报和持续改进意识。
+      </p>
+    </section>
+
+    <div class="resume-footer">
+      <a href="/" class="back-link">← 返回首页</a>
+      <button class="print-btn" onclick="downloadResume()">下载简历</button>
+    </div>
+  </main>
+  </div>
+
+<script>
+  // 手机端按桌面 900px 版式整体缩放，呈现类似完整 PDF 页面的视角。
+  function fitResumeForViewport() {
+    const stage = document.querySelector('.resume-stage');
+    const resume = stage?.querySelector('.resume');
+    if (!stage || !resume) return;
+
+    if (window.matchMedia('(max-width: 700px)').matches) {
+      const desktopWidth = 900;
+      const scale = Math.min(1, stage.clientWidth / desktopWidth);
+      const left = Math.max(0, (stage.clientWidth - desktopWidth * scale) / 2);
+      resume.style.transform = `scale(${scale})`;
+      resume.style.left = `${left}px`;
+      stage.style.height = `${resume.offsetHeight * scale + 24}px`;
+    } else {
+      resume.style.removeProperty('transform');
+      resume.style.removeProperty('left');
+      stage.style.removeProperty('height');
+    }
+  }
+
+  window.addEventListener('resize', fitResumeForViewport);
+  window.addEventListener('DOMContentLoaded', fitResumeForViewport);
+
+  function downloadResume() {
+    const btn = document.querySelector('.print-btn');
+    btn.textContent = '生成中...';
+    btn.disabled = true;
+
+    const original = document.querySelector('.resume');
+    const clone = original.cloneNode(true);
+    const footer = clone.querySelector('.resume-footer');
+    if (footer) footer.remove();
+
+    // 为 A4 页面优化排版
+    clone.style.width = '190mm';
+    clone.style.padding = '0';
+    clone.style.margin = '0 auto';
+    clone.style.background = '#fff';
+    clone.style.color = '#222';
+    clone.style.fontSize = '11pt';
+    clone.style.lineHeight = '1.5';
+    clone.style.boxSizing = 'border-box';
+
+    // 防止关键元素跨页断裂
+    clone.querySelectorAll('.section, .item, .header, .skills, .skill-box').forEach(el => {
+      el.style.pageBreakInside = 'avoid';
+      el.style.breakInside = 'avoid';
+    });
+
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '-9999px';
+    wrapper.style.top = '0';
+    wrapper.style.width = '210mm';
+    wrapper.style.background = '#fff';
+    document.body.appendChild(wrapper);
+    wrapper.appendChild(clone);
+
+    function cleanup() {
+      wrapper.remove();
+      btn.textContent = '下载简历';
+      btn.disabled = false;
+    }
+
+    // 用 html2pdf 渲染 PDF（含自动分页）
+    const opt = {
+      margin:       [8, 12, 8, 12],
+      filename:     '简历.pdf',
+      image:        { type: 'jpeg', quality: 0.95 },
+      html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#fff', letterRendering: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: ['css', 'legacy'] }
+    };
+    html2pdf().set(opt).from(clone).save().then(cleanup).catch(() => {
+      cleanup();
+      alert('PDF 生成失败');
+      window.print();
+    });
+  }
+</script>
+</body>
+</html>

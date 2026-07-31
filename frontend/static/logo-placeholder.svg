@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
+  <title id="title">站点标志占位图</title>
+  <desc id="desc">请替换为自己的站点标志</desc>
+  <circle cx="100" cy="100" r="96" fill="#163552" stroke="#d9a441" stroke-width="8"/>
+  <path d="M55 73h90v17H55zm14 31h62v17H69zm15 31h32v17H84z" fill="#d9a441"/>
+</svg>

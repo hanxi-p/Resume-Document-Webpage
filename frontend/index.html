@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>个人主页 | Portfolio</title>
+    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+    <!-- KaTeX for formula rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <style>
+        /* ── 毛笔字体 ── */
+        @import url('https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5/index.css');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
+        a, button, .research-chip, .print-btn, .back-link, .primary-btn, .secondary-btn {
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+        a:focus, a:focus-visible, a:active,
+        button:focus, button:focus-visible, button:active {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: none;
+        }
+        html { overflow-y: scroll; }
+
+        :root {
+            --bg-dark: #07111f;
+            --card-bg: rgba(12, 22, 36, 0.72);
+            --text-main: #f5f7fb;
+            --text-sub: rgba(245, 247, 251, 0.72);
+            --accent: #d9a441;
+            --accent-dim: rgba(217, 164, 65, 0.12);
+            --border: rgba(255, 255, 255, 0.16);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            animation: pageIn 0.4s ease;
+        }
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── 导航栏（含校徽校训） ── */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0 2rem;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+            transition: transform 0.35s ease;
+        }
+        .navbar.hidden {
+            transform: translateY(-100%);
+        }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .nav-badge {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            opacity: 0.82;
+            flex-shrink: 0;
+            filter: grayscale(0.1);
+            transition: opacity .3s;
+            pointer-events: none;
+        }
+        .nav-badge:hover {
+            opacity: 0.85;
+        }
+        .navbar .motto {
+            font-family: 'Ma Shan Zheng', 'STXingkai', 'KaiTi', cursive;
+            font-size: 1.6rem;
+            color: #d9a441;
+            text-shadow: 0 0 16px rgba(217, 164, 65, 0.3);
+            letter-spacing: 0.12em;
+            white-space: nowrap;
+            display: inline-flex;
+            column-gap: 0.35em;
+        }
+        .navbar nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            align-self: center;
+        }
+        .navbar nav a {
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: color .2s;
+            font-weight: 500;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+        .navbar nav a:focus,
+        .navbar nav a:focus-visible,
+        .navbar nav a:active,
+        .navbar nav a:focus-within { outline: none !important; -webkit-tap-highlight-color: transparent !important; box-shadow: none !important; }
+        .navbar nav a:hover { color: var(--text-main); }
+        .navbar nav a.active {
+            color: var(--text-main);
+            font-weight: 700;
+            position: relative;
+        }
+        .navbar nav a.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -10px;
+            height: 2px;
+            border-radius: 99px;
+            background: var(--accent);
+        }
+
+        /* ── Hero ── */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+            justify-content: flex-end;
+            padding: 0;
+        }
+        .hero-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background: var(--bg-dark);
+        }
+        .hero-bg .carousel-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 0;
+            transform: scale(1.015);
+            transition: opacity 0.9s ease, transform 5s ease;
+        }
+        .hero-bg .carousel-slide.is-active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .hero-bg .overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at center, rgba(24, 42, 62, 0.28), rgba(0, 0, 0, 0.22)),
+                linear-gradient(120deg, rgba(8, 18, 32, 0.18), rgba(0, 0, 0, 0.30));
+        }
+        .carousel-controls {
+            position: fixed;
+            left: 1.5rem;
+            bottom: 1.5rem;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.5rem 0.65rem;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 999px;
+            background: rgba(7, 17, 31, 0.48);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .carousel-dot {
+            border: 0;
+            color: #fff;
+            cursor: pointer;
+            background: transparent;
+        }
+        .carousel-dots {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .carousel-dot {
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.45);
+            transition: width 0.25s ease, border-radius 0.25s ease, background 0.25s ease;
+        }
+        .carousel-dot.is-active {
+            width: 1.45rem;
+            border-radius: 999px;
+            background: var(--accent);
+        }
+        .hero.resume-view .carousel-controls { display: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-bg .carousel-slide { transition: none; }
+        }
+
+        /* ── 主面板（竖贯画面） ── */
+        .profile-card {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 90px 2rem 3rem;
+            max-width: 467px;
+            width: 100%;
+            min-height: 100vh;
+            background: rgba(12, 22, 36, 0.42);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(255, 255, 255, 0.10);
+            box-shadow: -8px 0 40px rgba(0, 0, 0, 0.30);
+        }
+
+        .identity-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.1rem;
+            width: 100%;
+            margin-bottom: 0.65rem;
+        }
+        .identity-row h1 { margin: 0; }
+        .identity-row .avatar { margin-bottom: 0; }
+        .identity-copy {
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .identity-copy h1,
+        .identity-copy .pinyin,
+        .identity-copy .distributed-line {
+            width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .identity-copy .pinyin {
+            margin: 0.2rem 0 0.35rem;
+            letter-spacing: 0;
+        }
+        .identity-copy .subtitle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.08rem;
+            margin: 0;
+            line-height: 1.35;
+        }
+
+        .avatar {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            margin-bottom: 1.2rem;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* ── 点击头像复制邮箱，气泡从头像上方弹出 ── */
+        .avatar-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .avatar-wrapper,
+        .avatar-wrapper * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-focus-ring-color: transparent;
+        }
+        .avatar-tooltip {
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 14px);
+            transform: translateX(-50%) translateY(-12px) scale(0.3);
+            transform-origin: center bottom;
+            background: rgba(255, 255, 255, 0.92);
+            color: #222;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            text-align: center;
+            line-height: 1.7;
+            z-index: 20;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+            border: 1.5px solid rgba(200, 200, 200, 0.3);
+            transition: none;
+        }
+        .avatar-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 7px solid transparent;
+            border-top-color: rgba(255,255,255,0.92);
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .avatar-wrapper:hover .avatar {
+                transform: translateY(6px);
+            }
+            .avatar-wrapper:hover .avatar-tooltip {
+                animation: bubblePopDown 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            }
+        }
+        .avatar-wrapper.active .avatar {
+            transform: translateY(6px);
+        }
+        .avatar-wrapper.active .avatar-tooltip {
+            animation: bubblePopDown 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes bubblePopDown {
+            0%   { opacity: 0; transform: translateX(-50%) translateY(-14px) scale(0.25); }
+            55%  { opacity: 1; transform: translateX(-50%) translateY(3px) scale(1.10); }
+            75%  { transform: translateX(-50%) translateY(-1px) scale(0.94); }
+            100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+        }
+        .copy-toast {
+            position: absolute;
+            left: 50%;
+            top: calc(100% + 12px);
+            transform: translateX(-50%) translateY(-8px) scale(0.92);
+            opacity: 0;
+            padding: 7px 13px;
+            border-radius: 999px;
+            background: rgba(12, 22, 36, 0.92);
+            color: #fff;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 20;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+        }
+        .avatar-wrapper.copied .copy-toast {
+            animation: copyToastPop 1.8s ease forwards;
+        }
+        @keyframes copyToastPop {
+            0%   { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.92); }
+            15%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            72%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(6px) scale(0.96); }
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.15rem;
+            color: var(--text-main);
+        }
+        .pinyin {
+            color: rgba(245, 247, 251, 0.78);
+            letter-spacing: 0.18em;
+            font-size: 14px;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: rgba(245, 247, 251, 0.78);
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+        }
+
+        /* ── 研究方向可展开标签 ── */
+        .research-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+            max-width: 520px;
+            margin: 0.4rem auto 0.6rem;
+            width: 100%;
+        }
+        .research-chip {
+            display: inline-block;
+            padding: 0.4rem 0.5rem;
+            border-radius: 99px;
+            font-size: 0.84rem;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-sub);
+            transition: all .25s ease;
+            font-family: inherit;
+            user-select: none;
+            -webkit-user-select: none;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+        .research-chip:focus,
+        .research-chip:focus-visible,
+        .research-chip:active {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .research-chip:hover {
+            color: var(--accent);
+            border-color: rgba(217, 164, 65, 0.4);
+            background: var(--accent-dim);
+            transform: translateY(-1px);
+        }
+        .research-chip.active {
+            color: #101827;
+            background: var(--accent);
+            border-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .email {
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin: 0.6rem 0 1.4rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── 可展开详情 ── */
+        .research-detail-wrap {
+            width: 100%;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.3s ease,
+                        transform 0.3s ease;
+            margin-top: 0;
+        }
+        .research-detail-wrap.open {
+            margin-top: 0.8rem;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .research-detail-inner {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 16px;
+            padding: 1rem 1.4rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: left;
+            font-size: 0.88rem;
+        }
+        .research-detail-inner h3 {
+            color: var(--accent);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+        .research-detail-inner p {
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 0.4rem;
+            font-size: 0.84rem;
+        }
+        .research-detail-inner p:last-child { margin-bottom: 0; }
+        .research-detail-inner .katex { font-size: 1.05em; }
+        .research-detail-inner .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 99px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(217, 164, 65, 0.15);
+            margin: 0.1rem 0.15rem;
+        }
+        .research-detail h3 {
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+        }
+        .research-detail p {
+            color: var(--text-sub);
+            font-size: 0.88rem;
+            line-height: 1.7;
+            margin-bottom: 0.5rem;
+        }
+        .research-detail p:last-child { margin-bottom: 0; }
+        .research-detail .tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 99px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(217, 164, 65, 0.15);
+            margin: 0.15rem 0.15rem;
+        }
+
+        /* ── 按钮 ── */
+        .links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 0.2rem;
+        }
+        .links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.55rem 1.5rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all .2s ease;
+            border: 1.5px solid transparent;
+        }
+        .primary-btn {
+            background: #d9a441;
+            color: #101827;
+            font-weight: 700;
+            border-color: #d9a441;
+            box-shadow: 0 10px 30px rgba(217, 164, 65, 0.28);
+        }
+        .primary-btn:hover {
+            background: #e0b050;
+            border-color: #e0b050;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 35px rgba(217, 164, 65, 0.35);
+        }
+        .secondary-btn {
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            margin-top: 2rem;
+            color: rgba(245, 247, 251, 0.35);
+            font-size: 0.78rem;
+        }
+
+        /* ── ICP 备案号（页面底部中央） ── */
+        .icp-footer {
+            position: fixed;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(245, 247, 251, 0.35);
+            font-size: 0.78rem;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ── 视图切换 ── */
+        #view-resume { display: none; width: 100%; }
+        .hero.resume-view {
+            justify-content: center;
+            align-items: flex-start;
+            padding: 5.5rem 1rem 3rem !important;
+        }
+        .hero.resume-view .profile-card { display: none; }
+        .hero.resume-view #view-resume  { display: block; animation: viewIn 0.3s ease; }
+        @keyframes viewIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .resume {
+            max-width: 900px;
+            margin: 1.5rem auto 3rem;
+            background: #fff;
+            padding: 44px 56px;
+            border-radius: 14px;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 1;
+            color: #222;
+        }
+        .resume .header {
+            border-bottom: 3px solid #1f4e79;
+            padding-bottom: 20px;
+            margin-bottom: 28px;
+        }
+        .resume .name {
+            font-size: 34px; font-weight: 700;
+            color: #1f4e79; margin: 0 0 4px;
+            letter-spacing: 2px;
+        }
+        .resume .title { font-size: 18px; color: #555; margin-bottom: 12px; }
+        .resume .contact { font-size: 14px; color: #555; }
+        .resume .placeholder { color: #777; }
+        .resume .section { margin-bottom: 26px; }
+        .resume .section-title {
+            font-size: 20px; font-weight: 700; color: #1f4e79;
+            border-left: 5px solid #1f4e79; padding-left: 12px; margin-bottom: 14px;
+        }
+        .resume .item { margin-bottom: 16px; }
+        .resume .item-header {
+            display: flex; justify-content: space-between; gap: 16px;
+            font-weight: 700; color: #222;
+        }
+        .resume .item-subtitle { color: #666; margin: 3px 0 6px; }
+        .resume ul { margin: 8px 0 0 20px; padding: 0; }
+        .resume li { margin-bottom: 6px; }
+        .resume .skills {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 10px 24px;
+        }
+        .resume .skill-box {
+            background: #f5f8fb; border: 1px solid #dce7f2;
+            border-radius: 8px; padding: 10px 12px;
+        }
+        .resume .back-link { display: inline-block; margin-top: 0; color: #666; text-decoration: none; font-size: 1rem; font-weight: 600; }
+        .resume .back-link:hover { color: #1f4e79; }
+        .resume-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+        .print-btn {
+            background: none;
+            border: none;
+            color: #666;
+            padding: 0;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: color .2s;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .print-btn:hover {
+            color: #1f4e79;
+        }
+        @media print { @page { margin: 15mm 18mm; } .navbar, .hero-bg, .profile-card, .print-btn, .back-link { display: none !important; } .resume { margin: 0; padding: 0; box-shadow: none; border-radius: 0; } .resume-footer { display: none !important; } .resume .section, .resume .item, .resume .header, .resume .skills, .resume .skill-box { page-break-inside: avoid; break-inside: avoid; } }
+        @media (max-width: 700px) {
+            .carousel-controls { display: none; }
+            .hero {
+                justify-content: flex-end;
+                align-items: stretch;
+                padding: 0;
+            }
+            .hero.resume-view {
+                padding: 64px 8px 0 !important;
+                overflow: hidden;
+            }
+            .hero.resume-view #view-resume {
+                position: relative;
+                width: 100%;
+                padding: 0;
+            }
+            .hero.resume-view .resume {
+                width: 900px;
+                max-width: none;
+                margin: 0;
+                position: absolute;
+                top: 16px;
+                left: 0;
+                transform-origin: top left;
+            }
+            .profile-card {
+                max-width: 100%;
+                padding: 80px 1.5rem 2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .icp-footer { position: absolute; bottom: 12px; }
+            .hero.resume-view #view-resume { padding-bottom: 0; }
+            .avatar { width: 90px; height: 90px; }
+            .identity-copy { min-height: 60px; }
+            .identity-copy h1,
+            .identity-copy .pinyin,
+            .identity-copy .distributed-line { width: 80px; }
+            .identity-copy h1 { font-size: 1.25rem; }
+            .identity-copy .pinyin { margin: 0.12rem 0 0.2rem; font-size: 9px; }
+            .identity-copy .subtitle { font-size: 0.63rem; line-height: 1.2; gap: 0.04rem; }
+            h1 { font-size: 1.5rem; }
+            .profile-card { padding: 60px 1.5rem 4.5rem; min-height: 100vh; border-left: none; box-shadow: none; background: rgba(12, 22, 36, 0.16); backdrop-filter: blur(4px); }
+            .navbar { padding: 0 1rem; height: 64px; min-height: unset; align-items: center; background: linear-gradient(135deg, #0d1b2a, #1a3a5c); backdrop-filter: blur(12px); }
+            .navbar nav { gap: 1rem; }
+            .navbar nav a { font-size: 1.08rem; }
+            .hero { padding-top: 0; }
+            .research-list { max-width: 100%; gap: 0.85rem 0.5rem; grid-template-columns: repeat(2, 1fr); }
+            .research-chip { font-size: 0.92rem; padding: 0.5rem 0.15rem; grid-column: auto !important; }
+            .research-detail-inner { background: rgba(0, 0, 0, 0.55); padding: 0.8rem 1rem; }
+            .research-detail-inner p { font-size: 0.82rem; }
+            .research-detail-inner h3 { font-size: 0.88rem; }
+            .email { font-size: 0.82rem; }
+            .links a { padding: 0.4rem 1rem; font-size: 0.85rem; }
+            .nav-badge { width: 64px; height: 64px; }
+            .navbar .motto { font-size: 0.96rem; display: inline-flex; flex-direction: column; line-height: 1.3; letter-spacing: 0.04em; margin-left: 0.8rem; }
+            .nav-left { gap: 0.5rem; align-items: center; }
+        }
+
+        @media (max-width: 400px) {
+            h1 { font-size: 1.35rem; }
+            .profile-card { padding: 50px 1.2rem 4rem; }
+            .research-chip { font-size: 0.85rem; padding: 0.45rem 0.12rem; }
+            .research-list { gap: 0.7rem 0.35rem; }
+            .navbar .motto { font-size: 0.86rem; display: inline-flex; flex-direction: column; line-height: 1.25; margin-left: 0.5rem; }
+            .nav-badge { width: 52px; height: 52px; }
+            .navbar { height: 52px; min-height: unset; padding: 0 0.8rem; align-items: center; }
+            .navbar nav a { font-size: 0.98rem; }
+            .navbar nav { gap: 0.72rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-left">
+            <img src="static/logo-placeholder.svg" alt="站点标志" class="nav-badge">
+            <span class="motto"><span>个人简历</span><span>作品展示</span></span>
+        </div>
+        <nav>
+            <a href="#" class="active" data-view="home">首页</a>
+            <a href="#" data-view="resume">简历</a>
+            <a href="https://github.com/yourname" target="_blank">GitHub</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-bg" id="hero-carousel" aria-label="背景图片轮播图">
+            <img src="static/756.jpg" alt="背景风景图一" class="carousel-slide is-active" fetchpriority="high" decoding="async">
+            <img src="static/ban01.jpg" alt="背景风景图二" class="carousel-slide" decoding="async">
+            <img src="static/chdt.jpg" alt="背景风景图三" class="carousel-slide" decoding="async">
+            <img src="static/54qp.jpg" alt="背景风景图四" class="carousel-slide" decoding="async">
+            <div class="overlay"></div>
+        </div>
+
+        <div class="carousel-controls" aria-label="轮播图控制">
+            <div class="carousel-dots" role="group" aria-label="选择轮播图片">
+                <button type="button" class="carousel-dot is-active" data-slide-to="0" aria-label="显示第 1 张图片" aria-current="true"></button>
+                <button type="button" class="carousel-dot" data-slide-to="1" aria-label="显示第 2 张图片" aria-current="false"></button>
+                <button type="button" class="carousel-dot" data-slide-to="2" aria-label="显示第 3 张图片" aria-current="false"></button>
+                <button type="button" class="carousel-dot" data-slide-to="3" aria-label="显示第 4 张图片" aria-current="false"></button>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="identity-row">
+                <div class="identity-copy">
+                    <h1 aria-label="姓名">
+                        <span aria-hidden="true">姓</span><span aria-hidden="true">名</span>
+                    </h1>
+                    <div class="pinyin" aria-label="YOUR NAME">
+                        <span aria-hidden="true">Y</span><span aria-hidden="true">O</span><span aria-hidden="true">U</span><span aria-hidden="true">R</span><span aria-hidden="true">N</span><span aria-hidden="true">A</span><span aria-hidden="true">M</span><span aria-hidden="true">E</span>
+                    </div>
+                    <div class="subtitle">
+                        <div class="distributed-line" aria-label="油气田开发工程">
+                            <span aria-hidden="true">油</span><span aria-hidden="true">气</span><span aria-hidden="true">田</span><span aria-hidden="true">开</span><span aria-hidden="true">发</span><span aria-hidden="true">工</span><span aria-hidden="true">程</span>
+                        </div>
+                        <div class="distributed-line" aria-label="储层增产改造">
+                            <span aria-hidden="true">储</span><span aria-hidden="true">层</span><span aria-hidden="true">增</span><span aria-hidden="true">产</span><span aria-hidden="true">改</span><span aria-hidden="true">造</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="avatar-wrapper" role="button" tabindex="0" aria-label="复制邮箱 hello@example.com">
+                    <img src="static/avatar-placeholder.svg" alt="头像占位图" class="avatar">
+                    <div class="avatar-tooltip">
+                        <div>老大，记得联系我喵！</div><div style="margin-top:2px">hello@example.com</div>
+                    </div>
+                    <div class="copy-toast" role="status" aria-live="polite">已复制邮箱</div>
+                </div>
+            </div>
+
+            <!-- 可点击研究方向标签（由 research-directions.txt 生成） -->
+            <div class="research-list" id="research-list"></div>
+
+            <!-- 可展开详情（由 research-directions.txt 生成） -->
+            <div id="research-details"></div>
+
+            <div class="email">hello@example.com</div>
+
+            <div class="links">
+                <a href="#" class="primary-btn" data-view="resume">查看简历</a>
+                <a href="https://github.com/yourname" target="_blank" class="secondary-btn">GitHub</a>
+            </div>
+        </div>
+
+        <!-- ── 简历视图（使用模板内容） ── -->
+        <div class="view" id="view-resume">
+            <main class="resume">
+                <header class="header">
+                    <h1 class="name">姓名</h1>
+                    <div class="title">石油工程硕士｜求职意向：油藏工程 / 钻完井工程 / 生产工程 / 能源技术相关岗位</div>
+                    <div class="contact">
+                        手机：138-0000-0000 ｜ 邮箱：hello@example.com ｜ 城市：填写城市 ｜ LinkedIn/个人主页：填写链接
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-title">个人简介</div>
+                    <p>
+                        石油工程硕士，具备油藏工程、钻井工程、采油工程及油气田开发相关专业背景。
+                        熟悉油气藏评价、生产动态分析、数值模拟、井筒与地层流动基础理论，具备较强的数据分析、工程建模和技术报告撰写能力。
+                        期望在能源、油气开发、工程技术或相关咨询岗位中发挥专业优势。
+                    </p>
+                </section>
+
+                <section class="section">
+                    <div class="section-title">教育背景</div>
+                    <div class="item">
+                        <div class="item-header">
+                            <span>学校名称｜石油工程｜硕士</span>
+                            <span class="placeholder">20XX.XX - 20XX.XX</span>
+                        </div>
+                        <div class="item-subtitle">研究方向：油藏工程 / 钻完井工程 / 提高采收率 / 非常规油气开发（按实际填写）</div>
+                        <ul>
+                            <li>主修课程：油藏工程、高等渗流力学、钻井工程、采油工程、油气田开发地质、油藏数值模拟等。</li>
+                            <li>硕士论文：填写论文题目或研究课题。</li>
+                        </ul>
+                    </div>
+                    <div class="item">
+                        <div class="item-header">
+                            <span>学校名称｜专业名称｜本科</span>
+                            <span class="placeholder">20XX.XX - 20XX.XX</span>
+                        </div>
+                        <div class="item-subtitle">可填写绩点、排名、奖学金或相关荣誉。</div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-title">科研 / 项目经历</div>
+                    <div class="item">
+                        <div class="item-header">
+                            <span>项目名称：填写项目名称</span>
+                            <span class="placeholder">20XX.XX - 20XX.XX</span>
+                        </div>
+                        <div class="item-subtitle">角色：项目成员 / 负责人 / 研究助理</div>
+                        <ul>
+                            <li>围绕油藏开发、产能评价、注采优化或提高采收率等方向开展研究与分析。</li>
+                            <li>负责数据整理、模型建立、参数敏感性分析、结果可视化及技术报告撰写。</li>
+                            <li>使用 Eclipse / CMG / Petrel / MATLAB / Python / Excel 等工具完成相关工作（按实际修改）。</li>
+                        </ul>
+                    </div>
+                    <div class="item">
+                        <div class="item-header">
+                            <span>项目名称：填写项目名称</span>
+                            <span class="placeholder">20XX.XX - 20XX.XX</span>
+                        </div>
+                        <ul>
+                            <li>填写项目背景、个人职责、使用方法和最终成果。</li>
+                            <li>建议突出量化结果，例如"模型误差降低 XX%""完成 XX 口井生产动态分析"。</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-title">实习 / 工作经历</div>
+                    <div class="item">
+                        <div class="item-header">
+                            <span>公司名称｜岗位名称</span>
+                            <span class="placeholder">20XX.XX - 20XX.XX</span>
+                        </div>
+                        <ul>
+                            <li>参与油气田开发方案、生产数据分析、现场资料整理或工程技术支持工作。</li>
+                            <li>协助完成日报、月报、技术总结或汇报材料，提升跨部门沟通与工程问题分析能力。</li>
+                            <li>填写与目标岗位最相关的成果和贡献。</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-title">专业技能</div>
+                    <div class="skills">
+                        <div class="skill-box"><strong>专业方向：</strong>油藏工程、钻井工程、采油工程、油气田开发</div>
+                        <div class="skill-box"><strong>软件工具：</strong>Eclipse / CMG / Petrel / MATLAB / Python / Excel</div>
+                        <div class="skill-box"><strong>数据分析：</strong>生产动态分析、参数拟合、图表可视化、技术报告</div>
+                        <div class="skill-box"><strong>语言能力：</strong>中文母语，英语 CET-6 / IELTS / TOEFL（按实际填写）</div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-title">论文 / 证书 / 荣誉</div>
+                    <ul>
+                        <li>论文：填写论文题目、期刊 / 会议名称、作者顺序、发表时间。</li>
+                        <li>证书：填写英语证书、计算机证书、专业软件培训证书等。</li>
+                        <li>荣誉：填写奖学金、优秀学生、竞赛获奖等。</li>
+                    </ul>
+                </section>
+
+                <section class="section">
+                    <div class="section-title">自我评价</div>
+                    <p>
+                        具备扎实的石油工程专业基础和较强的学习能力，能够快速理解工程问题并进行系统分析。
+                        做事认真负责，注重数据准确性和结果表达，具备良好的团队协作、沟通汇报和持续改进意识。
+                    </p>
+                </section>
+
+                <div class="resume-footer">
+                    <a href="#" class="back-link" data-view="home">← 返回首页</a>
+                    <button class="print-btn" onclick="downloadResume()">下载简历</button>
+                </div>
+            </main>
+        </div>
+
+        <div class="icp-footer">&copy; 2026 YOUR NAME</div>
+    </section>
+
+    <script>
+        // ── 从 research-directions.txt 加载专注方向数据 ──
+        let researchData = [];
+
+        async function loadResearchData() {
+            try {
+                const resp = await fetch('/static/research-directions.txt?' + Date.now());
+                researchData = await resp.json();
+                renderResearch();
+            } catch (e) {
+                console.error('加载专注方向数据失败:', e);
+            }
+        }
+
+        function renderResearch() {
+            const list = document.getElementById('research-list');
+            const details = document.getElementById('research-details');
+            if (!list || !details || !researchData.length) return;
+
+            // 生成标签按钮
+            list.innerHTML = researchData.map((item, i) =>
+                `<button class="research-chip" data-index="${i}">${item.label}</button>`
+            ).join('');
+
+            // 生成详情块
+            details.innerHTML = researchData.map((item, i) =>
+                `<div class="research-detail-wrap" id="d-${i}">
+                    <div class="research-detail">
+                        <div class="research-detail-inner">
+                            <h3>${item.title}</h3>
+                            <p>${item.content.replace(/\n/g, '<br>')}</p>
+                            <p>${(item.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</p>
+                        </div>
+                    </div>
+                </div>`
+            ).join('');
+
+            // 渲染 LaTeX 公式（KaTeX auto-render）
+            if (typeof renderMathInElement === 'function') {
+                try {
+                    renderMathInElement(details, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ],
+                        throwOnError: false
+                    });
+                } catch (e) {
+                    console.warn('KaTeX 渲染出错:', e);
+                }
+            }
+
+            // 绑定点击事件（事件委托）
+            list.addEventListener('click', e => {
+                const chip = e.target.closest('.research-chip');
+                if (!chip) return;
+                const idx = chip.dataset.index;
+                const wrap = document.getElementById('d-' + idx);
+                if (!wrap) return;
+                const isOpen = wrap.classList.contains('open');
+
+                // 关闭所有
+                document.querySelectorAll('.research-detail-wrap.open').forEach(w => {
+                    w.classList.remove('open');
+                    w.style.maxHeight = '0';
+                });
+                document.querySelectorAll('.research-chip.active').forEach(c => c.classList.remove('active'));
+
+                if (!isOpen) {
+                    wrap.classList.add('open');
+                    chip.classList.add('active');
+                    wrap.style.maxHeight = wrap.scrollHeight + 'px';
+                }
+            });
+        }
+
+        loadResearchData();
+
+        // ── 下载简历为 PDF ──
+        function downloadResume() {
+            const btn = document.querySelector('.print-btn');
+            btn.textContent = '生成中...';
+            btn.disabled = true;
+
+            // 克隆简历内容，去掉底部按钮
+            const original = document.querySelector('.resume');
+            const clone = original.cloneNode(true);
+            const footer = clone.querySelector('.resume-footer');
+            if (footer) footer.remove();
+
+            // 为 A4 页面优化排版
+            clone.style.width = '190mm';
+            clone.style.padding = '0';
+            clone.style.margin = '0 auto';
+            clone.style.background = '#fff';
+            clone.style.color = '#222';
+            clone.style.fontSize = '11pt';
+            clone.style.lineHeight = '1.5';
+            clone.style.boxSizing = 'border-box';
+
+            // 防止关键元素跨页断裂
+            clone.querySelectorAll('.section, .item, .header, .skills, .skill-box').forEach(el => {
+                el.style.pageBreakInside = 'avoid';
+                el.style.breakInside = 'avoid';
+            });
+
+            // 临时插入页面渲染
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = '-9999px';
+            wrapper.style.top = '0';
+            wrapper.style.width = '210mm';
+            wrapper.style.background = '#fff';
+            document.body.appendChild(wrapper);
+            wrapper.appendChild(clone);
+
+            function cleanup() {
+                wrapper.remove();
+                btn.textContent = '下载简历';
+                btn.disabled = false;
+            }
+
+            // 用 html2pdf 渲染 PDF（含自动分页）
+            const opt = {
+                margin:       [8, 12, 8, 12],
+                filename:     '简历.pdf',
+                image:        { type: 'jpeg', quality: 0.95 },
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#fff', letterRendering: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css', 'legacy'] }
+            };
+            html2pdf().set(opt).from(clone).save().then(cleanup).catch(() => {
+                cleanup();
+                alert('PDF 生成失败');
+                window.print();
+            });
+        }
+
+        // ── 点击头像复制邮箱并显示反馈 ──
+        const avatarWrapper = document.querySelector('.avatar-wrapper');
+        let avatarFeedbackTimer = null;
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            let copied = false;
+            try { copied = document.execCommand('copy'); } catch (_) { copied = false; }
+            textarea.remove();
+            return copied;
+        }
+
+        async function copyEmail() {
+            const email = 'hello@example.com';
+            if (navigator.clipboard?.writeText && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(email);
+                    return true;
+                } catch (_) { /* 使用兼容方案 */ }
+            }
+            return fallbackCopy(email);
+        }
+
+        avatarWrapper?.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            const copied = await copyEmail();
+            this.querySelector('.copy-toast').textContent = copied ? '已复制邮箱' : '复制失败，请手动复制';
+            this.classList.remove('active', 'copied');
+            void this.offsetWidth;
+            this.classList.add('active', 'copied');
+            window.clearTimeout(avatarFeedbackTimer);
+            avatarFeedbackTimer = window.setTimeout(() => {
+                this.classList.remove('active', 'copied');
+            }, 1800);
+        });
+        avatarWrapper?.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.avatar-wrapper')) avatarWrapper?.classList.remove('active', 'copied');
+        });
+
+        // ── 首页背景轮播 ──
+        (() => {
+            const carousel = document.getElementById('hero-carousel');
+            const slides = [...carousel.querySelectorAll('.carousel-slide')];
+            const dots = [...document.querySelectorAll('.carousel-dot')];
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            let current = 0;
+            let timer = null;
+
+            function showSlide(index) {
+                current = (index + slides.length) % slides.length;
+                slides.forEach((slide, i) => slide.classList.toggle('is-active', i === current));
+                dots.forEach((dot, i) => {
+                    const isActive = i === current;
+                    dot.classList.toggle('is-active', isActive);
+                    dot.setAttribute('aria-current', String(isActive));
+                });
+            }
+
+            function stopCarousel() {
+                if (timer) window.clearInterval(timer);
+                timer = null;
+            }
+
+            function startCarousel() {
+                stopCarousel();
+                if (!reduceMotion.matches && !document.hidden) {
+                    timer = window.setInterval(() => showSlide(current + 1), 5000);
+                }
+            }
+
+            dots.forEach(dot => dot.addEventListener('click', () => {
+                showSlide(Number(dot.dataset.slideTo));
+                startCarousel();
+            }));
+            carousel.addEventListener('mouseenter', stopCarousel);
+            carousel.addEventListener('mouseleave', startCarousel);
+            document.addEventListener('visibilitychange', startCarousel);
+            reduceMotion.addEventListener?.('change', startCarousel);
+            startCarousel();
+        })();
+
+        // ── 视图切换 (首页 / 简历) ──
+        function switchView(viewName) {
+            const hero = document.querySelector('.hero');
+            hero.classList.toggle('home-view', viewName === 'home');
+            hero.classList.toggle('resume-view', viewName === 'resume');
+            document.querySelectorAll('.navbar nav a[data-view]').forEach(a => {
+                a.classList.toggle('active', a.dataset.view === viewName);
+            });
+            // 切回首页时显示导航栏
+            if (viewName === 'home') document.querySelector('.navbar').classList.remove('hidden');
+            window.requestAnimationFrame(fitResumeForViewport);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 手机端按桌面 900px 版式整体缩放，呈现类似完整 PDF 页面的视角。
+        function fitResumeForViewport() {
+            const stage = document.getElementById('view-resume');
+            const resume = stage?.querySelector('.resume');
+            if (!stage || !resume) return;
+
+            if (window.matchMedia('(max-width: 700px)').matches && document.querySelector('.hero').classList.contains('resume-view')) {
+                const desktopWidth = 900;
+                const scale = Math.min(1, stage.clientWidth / desktopWidth);
+                const left = Math.max(0, (stage.clientWidth - desktopWidth * scale) / 2);
+                resume.style.transform = `scale(${scale})`;
+                resume.style.left = `${left}px`;
+                stage.style.height = `${resume.offsetHeight * scale + 32}px`;
+            } else {
+                resume.style.removeProperty('transform');
+                resume.style.removeProperty('left');
+                stage.style.removeProperty('height');
+            }
+        }
+
+        window.addEventListener('resize', fitResumeForViewport);
+
+        // ── 简历视图下滑隐藏导航栏 ──
+        let lastScrollY = 0;
+        window.addEventListener('scroll', () => {
+            const hero = document.querySelector('.hero');
+            if (!hero.classList.contains('resume-view')) return; // 只在简历视图生效
+            const currentY = window.scrollY;
+            const navbar = document.querySelector('.navbar');
+            if (currentY > lastScrollY && currentY > 80) {
+                navbar.classList.add('hidden');
+            } else {
+                navbar.classList.remove('hidden');
+            }
+            lastScrollY = currentY;
+        });
+
+        document.querySelectorAll('[data-view]').forEach(el => {
+            el.addEventListener('click', e => {
+                e.preventDefault();
+                switchView(el.dataset.view);
+            });
+        });
+
+        // 默认根据 URL hash 显示
+        const hash = window.location.hash.replace('#', '');
+        switchView(hash === 'resume' ? 'resume' : 'home');
+        window.addEventListener('hashchange', () => {
+            const h = window.location.hash.replace('#', '');
+            switchView(h === 'resume' ? 'resume' : 'home');
+        });
+    </script>
+</body>
+</html>
