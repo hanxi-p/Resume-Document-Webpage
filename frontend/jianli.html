@@ -1,459 +1,714 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>个人简历 - 石油工程硕士</title>
-  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>两页 A4 简历模板</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { overflow-y: scroll; }
+:root {
+      --resume-blue: #1769aa;
+      --resume-blue-dark: #0d4f86;
+      --ink: #171717;
+      --muted: #4f5963;
+      --paper-width: 210mm;
+      --resume-font: "Times New Roman", "SimSun", "宋体", "Songti SC", serif;
+      --heading-font: "Times New Roman", "SimHei", "黑体", sans-serif;
+    }
 
-    @import url('https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5/index.css');
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; min-height: 0; }
 
     body {
-      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-      animation: pageIn 0.35s ease;
-    }
-    @keyframes pageIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
+      background: #e8edf2;
+      color: var(--ink);
+      font-family: var(--resume-font);
+      padding: 24px 24px 40px;
     }
 
-    .hero-bg {
+    .toolbar {
       position: fixed;
-      inset: 0;
-      z-index: -1;
-    }
-    .hero-bg img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .hero-bg .overlay {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at center, rgba(24, 42, 62, 0.50), rgba(0, 0, 0, 0.45)),
-        linear-gradient(120deg, rgba(8, 18, 32, 0.40), rgba(0, 0, 0, 0.55));
+      z-index: 50;
+      top: 0;
+      left: 0;
+      right: 0;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: rgba(17, 42, 65, 0.96);
+      box-shadow: 0 3px 16px rgba(0, 0, 0, 0.18);
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
     }
 
-    /* ── 导航 ── */
-    .navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      padding: 0 2rem;
-      height: 90px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 24px rgba(0,0,0,0.25);
+    .toolbar button {
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 7px;
+      background: transparent;
+      color: #fff;
+      padding: 7px 14px;
+      font-size: 14px;
+      cursor: pointer;
     }
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-    .nav-badge {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      object-fit: cover;
-      opacity: 0.82;
-      flex-shrink: 0;
-      filter: grayscale(0.1);
-      pointer-events: none;
-    }
-    .navbar .motto {
-      font-family: 'Ma Shan Zheng', 'STXingkai', 'KaiTi', cursive;
-      font-size: 1.6rem;
-      color: #d9a441;
-      text-shadow: 0 0 16px rgba(217, 164, 65, 0.3);
-      letter-spacing: 0.12em;
-      white-space: nowrap;
-      display: inline-flex;
-      column-gap: 0.35em;
-    }
-    .navbar nav {
-      display: flex;
-      gap: 2rem;
-      align-items: center;
-      align-self: center;
-      margin-top: 8px;
-    }
-    .navbar nav a {
-      color: rgba(245, 247, 251, 0.72);
-      text-decoration: none;
-      font-size: 1.2rem;
-      transition: color .2s;
-      font-weight: 500;
-    }
-    .navbar nav a:hover { color: #f5f7fb; }
-    .navbar nav a.active {
-      color: #f5f7fb;
+
+    .toolbar button.primary {
+      background: #d9a441;
+      border-color: #d9a441;
+      color: #13283b;
       font-weight: 700;
-      position: relative;
     }
-    .navbar nav a.active::after {
+
+    .toolbar .tip {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 12px;
+      margin-left: 6px;
+    }
+
+    .page-stage {
+      position: relative;
+      width: 100%;
+    }
+
+    .page-stack {
+      width: var(--paper-width);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      transform-origin: top left;
+    }
+
+    .resume-page {
+      width: var(--paper-width);
+      height: 297mm;
+      margin: 0;
+      padding: 9mm 11mm 12mm;
+      background: #fff;
+      box-shadow: 0 8px 34px rgba(19, 42, 64, 0.18);
+      font-size: 13.5px;
+      line-height: 1.42;
+      letter-spacing: 0.01em;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 第 1 页集中放置全部项目，并保留舒展、易读的行距。 */
+    .resume-page[data-page="1"] {
+      padding-top: 9mm;
+      font-size: 13.5px;
+      line-height: 1.42;
+    }
+
+    .resume-page[data-page="1"] .section { margin-top: 2mm; }
+    .resume-page[data-page="1"] .project { margin-bottom: 1.5mm; }
+    .resume-page[data-page="1"] .project-line { margin-top: 0.3mm; }
+    .resume-page[data-page="1"] .detail-list li { margin: 0.35mm 0; }
+
+    /* 各级标题：中文黑体加粗，英文和数字使用 Times New Roman 加粗。 */
+    .resume-page h1,
+    .resume-page h2,
+    .resume-page h3,
+    .resume-page .brand-cn,
+    .resume-page .brand-en,
+    .resume-page .entry-heading,
+    .resume-page .project-head,
+    .resume-page .field-label,
+    .resume-page strong {
+      font-family: var(--heading-font);
+      font-weight: 700;
+    }
+
+    .resume-page::before {
       content: "";
       position: absolute;
-      left: 0; right: 0;
-      bottom: -10px;
-      height: 2px;
-      border-radius: 99px;
-      background: #d9a441;
+      inset: 9mm 11mm 12mm;
+      border: 1px dashed transparent;
+      pointer-events: none;
+      z-index: 20;
     }
 
-    /* ── 简历正文（使用模板内容） ── */
-    .resume {
-      max-width: 900px;
-      margin: 110px auto 40px;
-      background: #fff;
-      padding: 44px 56px;
-      border-radius: 14px;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
-      position: relative;
-      z-index: 1;
+    body.editing .resume-page {
+      outline: 2px solid var(--resume-blue);
+      outline-offset: 0;
+      box-shadow: 0 10px 36px rgba(23, 105, 170, 0.24);
     }
 
-    .header {
-      border-bottom: 3px solid #1f4e79;
-      padding-bottom: 20px;
-      margin-bottom: 28px;
-    }
-    .name {
-      font-size: 34px;
-      font-weight: 700;
-      color: #1f4e79;
-      margin: 0 0 8px;
-      letter-spacing: 2px;
-    }
-    .title {
-      font-size: 18px;
-      color: #555;
-      margin-bottom: 12px;
-    }
-    .contact {
-      font-size: 14px;
-      color: #555;
+    body.editing .resume-page::before {
+      border-color: rgba(23, 105, 170, 0.32);
     }
 
-    .section { margin-bottom: 26px; }
-    .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1f4e79;
-      border-left: 5px solid #1f4e79;
-      padding-left: 12px;
-      margin-bottom: 14px;
+    .page-number {
+      position: absolute;
+      left: 11mm;
+      right: 11mm;
+      bottom: 4mm;
+      text-align: center;
+      color: #8a929a;
+      font-family: var(--resume-font);
+      font-size: 10px;
+      letter-spacing: 0.06em;
     }
-    .item { margin-bottom: 16px; }
-    .item-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      font-weight: 700;
-      color: #222;
-    }
-    .item-subtitle { color: #666; margin: 3px 0 6px; }
-    ul { margin: 8px 0 0 20px; padding: 0; }
-    li { margin-bottom: 6px; }
-    .skills {
+
+    .resume-header {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px 24px;
+      grid-template-columns: minmax(0, 1fr) 26mm;
+      gap: 5mm;
+      align-items: stretch;
+      margin-bottom: 1mm;
     }
-    .skill-box {
-      background: #f5f8fb;
-      border: 1px solid #dce7f2;
-      border-radius: 8px;
-      padding: 10px 12px;
-    }
-    .placeholder { color: #777; }
-    .back-link {
-      display: inline-block; margin-top: 0;
-      color: #666; text-decoration: none; font-size: 1rem; font-weight: 600;
-    }
-    .back-link:hover { color: #1f4e79; }
-    .resume-footer {
+
+    .brand {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-top: 1.5rem;
+      gap: 3mm;
+      min-height: 17mm;
+      color: var(--resume-blue-dark);
     }
-    .print-btn {
-      background: none;
-      border: none;
-      color: #666;
+
+    .brand-logo {
+      width: 17mm;
+      height: 17mm;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .brand-cn {
+      font-family: var(--heading-font);
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    .brand-en {
+      margin-top: 2px;
+      font-family: var(--heading-font);
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .portrait {
+      width: 26mm;
+      height: 33mm;
+      object-fit: cover;
+      border: 1px solid #c8d1da;
+      background: #d9ecfb;
+      align-self: start;
+    }
+
+    .profile-fields {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 1mm 8mm;
+      margin-top: 1.5mm;
+      font-size: 13.5px;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: 2mm;
+      min-height: 5mm;
+      align-items: start;
+    }
+
+    .field-label { font-weight: 700; white-space: nowrap; }
+    .field-value { min-width: 20mm; }
+    .job-intention { line-height: 1.5; }
+
+    .section { margin-top: 2mm; position: relative; }
+
+    .section-title {
+      color: var(--resume-blue);
+      font-family: var(--heading-font);
+      font-size: 18.5px;
+      font-weight: 700;
+      line-height: 1.15;
+      padding: 0 0 0.5mm;
+      margin: 0 0 1.2mm;
+      border-bottom: 1.5px solid var(--resume-blue);
+      letter-spacing: 0.08em;
+    }
+
+    .entry { margin: 0 0 1.8mm; }
+
+    .entry-heading {
+      display: grid;
+      grid-template-columns: 34mm minmax(0, 1fr) 58mm;
+      gap: 3mm;
+      align-items: baseline;
+      font-size: 13.5px;
+    }
+
+    .entry-heading .date { white-space: nowrap; }
+    .entry-heading .center { text-align: center; font-weight: 700; }
+    .entry-heading .right { text-align: right; white-space: nowrap; }
+
+    .detail-list {
+      list-style: none;
       padding: 0;
+      margin: 0.4mm 0 0;
+    }
+
+    .detail-list li {
+      position: relative;
+      padding-left: 8mm;
+      margin: 0.4mm 0;
+    }
+
+    .detail-list li::before {
+      content: "●";
+      position: absolute;
+      left: 1mm;
+      top: -0.05em;
+      font-size: 9px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2mm 6mm;
+    }
+
+    .project {
+      display: grid;
+      grid-template-columns: 4mm minmax(0, 1fr);
+      gap: 1.5mm;
+      margin: 0 0 1.7mm;
+      position: relative;
+    }
+
+    .project-dot {
+      font-size: 10px;
+      line-height: 1.8;
+    }
+
+    .project-head {
+      display: grid;
+      grid-template-columns: 34mm minmax(0, 1fr) 20mm;
+      gap: 3mm;
+      align-items: baseline;
+      font-size: 13.5px;
+    }
+
+    .project-name { text-align: center; font-weight: 700; }
+    .project-role { text-align: right; font-weight: 700; white-space: nowrap; }
+    .project-line {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      align-items: start;
+      margin-top: 0.35mm;
+      text-align: justify;
+      position: relative;
+    }
+    .project-line strong { white-space: nowrap; }
+
+    /* 冒号后的正文独占第二列，手动回车和自动换行都与正文起点对齐。 */
+    .detail-list li:has(> strong + .editable),
+    .detail-grid > span:has(> strong + .editable),
+    .results-list li:has(> strong + .editable),
+    .skills-list li:has(> strong + .editable),
+    .summary-list li:has(> strong + .editable) {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .project-line > strong + .editable,
+    .detail-list li > strong + .editable,
+    .detail-grid > span > strong + .editable,
+    .results-list li > strong + .editable,
+    .skills-list li > strong + .editable,
+    .summary-list li > strong + .editable {
+      min-width: 0;
+    }
+
+    .results-list,
+    .skills-list,
+    .summary-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .results-list li,
+    .skills-list li {
+      position: relative;
+      padding-left: 8mm;
+      margin: 0.4mm 0;
+    }
+
+    .results-list li::before,
+    .skills-list li::before {
+      content: "●";
+      position: absolute;
+      left: 1mm;
+      top: -0.05em;
+      font-size: 9px;
+    }
+
+    .summary-list li { margin: 0.5mm 0; text-align: justify; position: relative; }
+
+    .editable:empty::after {
+      content: "请填写";
+      color: #929aa3;
+    }
+
+    body.editing .editable {
+      cursor: text;
+    }
+
+    body.editing .editable:hover {
+      outline: 1px dashed rgba(23, 105, 170, 0.45);
+      outline-offset: 1px;
+      background: rgba(255, 242, 170, 0.2);
+    }
+
+    body.editing .editable:focus {
+      outline: 2px solid var(--resume-blue);
+      background: #fffdf0;
+    }
+
+    [data-editor-control] { display: none; }
+
+    body.editing [data-editor-control] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      z-index: 30;
+    }
+
+    .section-editor-tools,
+    .list-editor-tools,
+    .project-editor-tools {
+      gap: 3px;
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+
+    .section-editor-tools { top: 0; right: 0; }
+    .project-editor-tools { top: -14px; right: 0; }
+    .list-editor-tools {
+      right: 0;
+      transform: translateY(-100%);
+    }
+
+    .editor-button {
+      border: 1px solid #7fa8ca;
+      border-radius: 4px;
+      background: #eef7ff;
+      color: #14598d;
+      padding: 0 5px;
+      font-size: 9px;
+      line-height: 1.2;
       cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: color .2s;
-      font-family: inherit;
-      text-decoration: none;
     }
-    .print-btn:hover {
-      color: #1f4e79;
+
+    .editor-button.danger {
+      border-color: #d99b9b;
+      background: #fff1f1;
+      color: #a23131;
     }
+
+    .line-delete,
+    .item-delete {
+      top: 0;
+      right: -39px;
+      margin: 0;
+    }
+
+    @media (max-width: 850px) {
+      body { padding: 0; overflow-x: hidden; }
+      .toolbar { justify-content: flex-start; overflow-x: auto; }
+      .toolbar .tip { display: none; }
+      .page-stage { width: 100%; overflow: hidden; }
+      .page-stack { position: absolute; top: 0; left: 0; margin: 0; }
+    }
+
+    @page { size: A4 portrait; margin: 0; }
 
     @media print {
-      @page { margin: 15mm 18mm; }
-      body { background: #fff; }
-      .navbar, .hero-bg, .print-btn, .back-link { display: none !important; }
-      .resume { margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
-      .resume-footer { display: none !important; }
-      .resume .section, .resume .item, .resume .header, .resume .skills, .resume .skill-box { page-break-inside: avoid; break-inside: avoid; }
-    }
-
-    @media (max-width: 700px) {
-      .navbar { padding: 0 1rem; height: 64px; min-height: unset; align-items: center; background: linear-gradient(135deg, #0d1b2a, #1a3a5c); backdrop-filter: blur(12px); }
-      .navbar nav { gap: 1rem; }
-      .navbar nav a { font-size: 1.08rem; }
-      .nav-badge { width: 64px; height: 64px; }
-      .navbar .motto { font-size: 0.96rem; display: inline-flex; flex-direction: column; line-height: 1.3; letter-spacing: 0.04em; margin-left: 0.8rem; }
-      .nav-left { gap: 0.5rem; align-items: center; }
-      .resume-stage {
-        position: relative;
-        width: 100%;
-        margin-top: 80px;
-        overflow: hidden;
+      body { background: #fff; padding: 0; }
+      .toolbar { display: none !important; }
+      .page-stage { width: auto !important; height: auto !important; overflow: visible !important; }
+      .page-stack {
+        width: 210mm !important;
+        display: block !important;
+        margin: 0 !important;
+        transform: none !important;
       }
-      .resume-stage .resume {
-        width: 900px;
-        max-width: none;
-        margin: 0;
-        position: absolute;
-        top: 0;
-        left: 0;
-        transform-origin: top left;
+      .resume-page {
+        position: static !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        padding: 9mm 11mm 12mm !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        transform: none !important;
+        overflow: hidden !important;
+        break-after: page;
+        page-break-after: always;
       }
+      .resume-page:last-child { break-after: auto; page-break-after: auto; }
+      .resume-page[data-page="1"] { padding-top: 9mm !important; }
+      .resume-page::before { display: none !important; }
+      [data-editor-control] { display: none !important; }
     }
   </style>
 </head>
 <body>
+  <div class="page-stage" id="page-stage">
+    <div class="page-stack" id="page-stack">
+    <main class="resume-page" data-page="1">
+      <header class="resume-header">
+        <div>
+          <div class="brand">
+            <img class="brand-logo" src="resume-assets/logo-placeholder.svg" alt="学校标志">
+            <div>
+              <div class="brand-cn">学校名称</div>
+              <div class="brand-en">UNIVERSITY NAME</div>
+            </div>
+          </div>
 
-  <div class="hero-bg">
-    <img src="static/756.jpg" alt="">
-    <div class="overlay"></div>
+          <div class="profile-fields">
+            <div>
+              <div class="field"><span class="field-label">姓名：</span><span class="field-value editable">姓名</span></div>
+              <div class="field"><span class="field-label">电话：</span><span class="field-value editable">138-0000-0000</span></div>
+              <div class="field"><span class="field-label">邮箱：</span><span class="field-value editable">name@example.com</span></div>
+            </div>
+            <div>
+              <div class="field"><span class="field-label">政治面貌：</span><span class="field-value editable">请填写</span></div>
+              <div class="field"><span class="field-label">出生年月：</span><span class="field-value editable">请填写</span></div>
+              <div class="field"><span class="field-label">求职意向：</span><span class="field-value editable job-intention">油气田开发工程、储层增产改造、能源数据分析相关岗位</span></div>
+            </div>
+          </div>
+        </div>
+        <img class="portrait" src="resume-assets/avatar-placeholder.svg" alt="个人照片">
+      </header>
+
+      <section class="section">
+        <h2 class="section-title">教育背景</h2>
+        <article class="entry">
+          <div class="entry-heading">
+            <span class="date editable">20XX.09–至今</span>
+            <span class="center editable">学校名称</span>
+            <span class="right editable">石油工程｜硕士</span>
+          </div>
+          <ul class="detail-list">
+            <li><strong>研究方向：</strong><span class="editable">岩石力学与地质力学、裂缝扩展与压裂优化、压裂酸化和储层改造</span></li>
+            <li><strong>担任职务：</strong><span class="editable">请填写硕士阶段担任的学生工作、课题组或团队职务</span></li>
+          </ul>
+        </article>
+
+        <article class="entry">
+          <div class="entry-heading">
+            <span class="date editable">20XX.09–20XX.06</span>
+            <span class="center editable">本科院校名称</span>
+            <span class="right editable">专业名称｜学士</span>
+          </div>
+          <ul class="detail-list">
+            <li><strong>专业方向：</strong><span class="editable">油气田开发</span></li>
+            <li><strong>专业课程：</strong><span class="editable">采油工程、天然气工程、岩石力学</span></li>
+            <li><strong>担任职务：</strong><span class="editable">请填写本科阶段担任的学生工作、班级或社团职务</span></li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="section" data-project-section>
+        <h2 class="section-title">项目 / 科研经历</h2>
+
+        <article class="project">
+          <span class="project-dot">●</span>
+          <div>
+            <div class="project-head">
+              <span class="editable">20XX.XX–至今</span>
+              <span class="project-name editable">岩石力学参数预测与地质力学评价</span>
+              <span class="project-role editable">负责人</span>
+            </div>
+            <div class="project-line"><strong>项目内容：</strong><span class="editable">融合测井、岩心实验与现场资料，开展岩石力学参数预测、地应力评价和井壁稳定性分析。</span></div>
+            <div class="project-line"><strong>主要工作：</strong><span class="editable">利用 Stacking、XGBoost 等模型预测静态杨氏模量、泊松比与抗压强度；完成动静态参数校正，并结合 SHAP 解释预测结果。</span></div>
+          </div>
+        </article>
+
+        <article class="project">
+          <span class="project-dot">●</span>
+          <div>
+            <div class="project-head">
+              <span class="editable">20XX.XX–20XX.XX</span>
+              <span class="project-name editable">裂缝扩展与压裂参数优化研究</span>
+              <span class="project-role editable">参与人</span>
+            </div>
+            <div class="project-line"><strong>项目内容：</strong><span class="editable">围绕水力裂缝起裂、扩展、转向及粗糙壁面导流机理，开展裂缝几何建模与施工响应识别。</span></div>
+            <div class="project-line"><strong>主要工作：</strong><span class="editable">分析应力阴影效应，优化簇间距、射孔参数与排量；利用 LSTM / GRU 识别施工压力响应特征，辅助判断裂缝扩展阶段。</span></div>
+          </div>
+        </article>
+
+        <article class="project">
+          <span class="project-dot">●</span>
+          <div>
+            <div class="project-head">
+              <span class="editable">20XX.XX–20XX.XX</span>
+              <span class="project-name editable">压裂酸化与储层改造效果评价</span>
+              <span class="project-role editable">参与人</span>
+            </div>
+            <div class="project-line"><strong>主要工作：</strong><span class="editable">建立酸岩反应动力学和改造前后渗流能力变化模型，分析酸液浓度、温度与矿物组成对反应速率的影响，并结合 ECLIPSE / Kinetix 开展效果模拟。</span></div>
+          </div>
+        </article>
+
+        <article class="project">
+          <span class="project-dot">●</span>
+          <div>
+            <div class="project-head">
+              <span class="editable">20XX.XX–20XX.XX</span>
+              <span class="project-name editable">机器学习与储层参数预测</span>
+              <span class="project-role editable">参与人</span>
+            </div>
+            <div class="project-line"><strong>主要工作：</strong><span class="editable">融合测井、岩心与生产动态数据，完成异常值处理、缺失值填补、特征工程和相关性分析，利用 RF、XGBoost、LightGBM 等模型预测储层参数。</span></div>
+          </div>
+        </article>
+
+        <article class="project">
+          <span class="project-dot">●</span>
+          <div>
+            <div class="project-head">
+              <span class="editable">20XX.XX–20XX.XX</span>
+              <span class="project-name editable">结构化数据处理与实验分析</span>
+              <span class="project-role editable">参与人</span>
+            </div>
+            <div class="project-line"><strong>主要工作：</strong><span class="editable">对测井数据、XRD 矿物组成、岩石力学应力应变曲线及酸岩反应速率数据进行清洗、标准化、结构化整理与可视化分析。</span></div>
+          </div>
+        </article>
+
+        <article class="project">
+          <span class="project-dot">●</span>
+          <div>
+            <div class="project-head">
+              <span class="editable">20XX.XX–20XX.XX</span>
+              <span class="project-name editable">脆性评价与甜点预测</span>
+              <span class="project-role editable">参与人</span>
+            </div>
+            <div class="project-line"><strong>主要工作：</strong><span class="editable">综合矿物组成、弹性参数、储层物性、含油气性与地应力条件，构建多属性评价模型，识别高可压性甜点段并解释主要控制因素。</span></div>
+          </div>
+        </article>
+
+        <article class="project">
+          <span class="project-dot">●</span>
+          <div>
+            <div class="project-head">
+              <span class="editable">20XX.XX–20XX.XX</span>
+              <span class="project-name editable">测井数据综合解释与储层评价</span>
+              <span class="project-role editable">参与人</span>
+            </div>
+            <div class="project-line"><strong>主要工作：</strong><span class="editable">整理自然伽马、电阻率、声波时差与密度等测井曲线，开展岩性识别、孔隙度计算、储层分层与物性综合评价。</span></div>
+          </div>
+        </article>
+
+        <article class="project">
+          <span class="project-dot">●</span>
+          <div>
+            <div class="project-head">
+              <span class="editable">20XX.XX–20XX.XX</span>
+              <span class="project-name editable">酸岩反应速率实验研究</span>
+              <span class="project-role editable">参与人</span>
+            </div>
+            <div class="project-line"><strong>主要工作：</strong><span class="editable">分析酸液浓度、温度、矿物组成和反应级数对溶蚀速率的影响，整理实验数据并建立酸岩反应动力学关系。</span></div>
+          </div>
+        </article>
+
+      </section>
+      <div class="page-number">第 1 页 / 共 2 页</div>
+    </main>
+
+    <main class="resume-page" data-page="2">
+      <section class="section">
+        <h2 class="section-title">科研成果</h2>
+        <ul class="results-list">
+          <li><strong>论文：</strong><span class="editable">请填写论文题目、期刊或会议名称、作者顺序、收录情况及发表时间</span></li>
+          <li><strong>专利：</strong><span class="editable">请填写专利名称、专利类型、发明人顺序、申请号或授权情况</span></li>
+          <li><strong>软著：</strong><span class="editable">请填写软件名称、本人排序、登记号及登记时间</span></li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">荣誉奖励</h2>
+        <ul class="results-list">
+          <li><strong>奖学金：</strong><span class="editable">请填写奖学金名称、等级及获奖时间</span></li>
+          <li><strong>荣誉称号：</strong><span class="editable">请填写优秀学生、优秀学生干部或其他荣誉称号</span></li>
+          <li><strong>竞赛获奖：</strong><span class="editable">请填写竞赛名称、奖项等级、本人角色及获奖时间</span></li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">技能能力</h2>
+        <ul class="skills-list">
+          <li><strong>编程与数据分析：</strong><span class="editable">熟悉 Python、MATLAB，具备数据清洗、特征工程、机器学习建模与结果可视化能力。</span></li>
+          <li><strong>专业软件：</strong><span class="editable">熟悉 ECLIPSE、CMG、Petrel、Kinetix，了解 Fluent、EDFM 等模拟方法。</span></li>
+          <li><strong>专业能力：</strong><span class="editable">掌握油藏工程、钻完井工程、储层改造、岩石力学与酸岩反应分析基础。</span></li>
+          <li><strong>语言与办公：</strong><span class="editable">英语水平请填写；熟练使用 Excel、PowerPoint、Origin 等办公与绘图软件。</span></li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">个人概述</h2>
+        <ul class="summary-list">
+          <li><strong>关于科研与项目：</strong><span class="editable">研究方向聚焦油气田开发、岩石力学和储层增产改造，具备数据分析、工程建模、结果解释与技术报告撰写能力，能够独立推进项目任务。</span></li>
+          <li><strong>关于协作与沟通：</strong><span class="editable">做事认真负责，注重数据准确性和结果表达，具备良好的团队协作、沟通汇报和持续改进意识。</span></li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">兴趣爱好</h2>
+        <ul class="results-list">
+          <li><strong>体育运动：</strong><span class="editable">请填写跑步、球类、健身或其他体育爱好</span></li>
+          <li><strong>阅读学习：</strong><span class="editable">请填写专业阅读、技术学习或长期关注的领域</span></li>
+          <li><strong>其他兴趣：</strong><span class="editable">请填写摄影、音乐、旅行、志愿服务或其他个人爱好</span></li>
+        </ul>
+      </section>
+      <div class="page-number">第 2 页 / 共 2 页</div>
+    </main>
+    </div>
   </div>
 
-  <header class="navbar">
-    <div class="nav-left">
-      <img src="static/logo-placeholder.svg" alt="站点标志" class="nav-badge">
-      <span class="motto"><span>个人简历</span><span>作品展示</span></span>
-    </div>
-    <nav>
-      <a href="/">首页</a>
-      <a href="jianli.html" class="active">简历</a>
-      <a href="https://github.com/yourname" target="_blank">GitHub</a>
-    </nav>
-  </header>
+  <script>
+    const pageStage = document.getElementById('page-stage');
+    const pageStack = document.getElementById('page-stack');
 
-  <div class="resume-stage">
-  <main class="resume">
-    <header class="header">
-      <h1 class="name">姓名</h1>
-      <div class="title">石油工程硕士｜求职意向：油藏工程 / 钻完井工程 / 生产工程 / 能源技术相关岗位</div>
-      <div class="contact">
-        手机：138-0000-0000 ｜ 邮箱：hello@example.com ｜ 城市：填写城市 ｜ LinkedIn/个人主页：填写链接
-      </div>
-    </header>
-
-    <section class="section">
-      <div class="section-title">个人简介</div>
-      <p>
-        石油工程硕士，具备油藏工程、钻井工程、采油工程及油气田开发相关专业背景。
-        熟悉油气藏评价、生产动态分析、数值模拟、井筒与地层流动基础理论，具备较强的数据分析、工程建模和技术报告撰写能力。
-        期望在能源、油气开发、工程技术或相关咨询岗位中发挥专业优势。
-      </p>
-    </section>
-
-    <section class="section">
-      <div class="section-title">教育背景</div>
-      <div class="item">
-        <div class="item-header">
-          <span>学校名称｜石油工程｜硕士</span>
-          <span class="placeholder">20XX.XX - 20XX.XX</span>
-        </div>
-        <div class="item-subtitle">研究方向：油藏工程 / 钻完井工程 / 提高采收率 / 非常规油气开发（按实际填写）</div>
-        <ul>
-          <li>主修课程：油藏工程、高等渗流力学、钻井工程、采油工程、油气田开发地质、油藏数值模拟等。</li>
-          <li>硕士论文：填写论文题目或研究课题。</li>
-        </ul>
-      </div>
-
-      <div class="item">
-        <div class="item-header">
-          <span>学校名称｜专业名称｜本科</span>
-          <span class="placeholder">20XX.XX - 20XX.XX</span>
-        </div>
-        <div class="item-subtitle">可填写绩点、排名、奖学金或相关荣誉。</div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-title">科研 / 项目经历</div>
-      <div class="item">
-        <div class="item-header">
-          <span>项目名称：填写项目名称</span>
-          <span class="placeholder">20XX.XX - 20XX.XX</span>
-        </div>
-        <div class="item-subtitle">角色：项目成员 / 负责人 / 研究助理</div>
-        <ul>
-          <li>围绕油藏开发、产能评价、注采优化或提高采收率等方向开展研究与分析。</li>
-          <li>负责数据整理、模型建立、参数敏感性分析、结果可视化及技术报告撰写。</li>
-          <li>使用 Eclipse / CMG / Petrel / MATLAB / Python / Excel 等工具完成相关工作（按实际修改）。</li>
-        </ul>
-      </div>
-
-      <div class="item">
-        <div class="item-header">
-          <span>项目名称：填写项目名称</span>
-          <span class="placeholder">20XX.XX - 20XX.XX</span>
-        </div>
-        <ul>
-          <li>填写项目背景、个人职责、使用方法和最终成果。</li>
-          <li>建议突出量化结果，例如"模型误差降低 XX%""完成 XX 口井生产动态分析"。</li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-title">实习 / 工作经历</div>
-      <div class="item">
-        <div class="item-header">
-          <span>公司名称｜岗位名称</span>
-          <span class="placeholder">20XX.XX - 20XX.XX</span>
-        </div>
-        <ul>
-          <li>参与油气田开发方案、生产数据分析、现场资料整理或工程技术支持工作。</li>
-          <li>协助完成日报、月报、技术总结或汇报材料，提升跨部门沟通与工程问题分析能力。</li>
-          <li>填写与目标岗位最相关的成果和贡献。</li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-title">专业技能</div>
-      <div class="skills">
-        <div class="skill-box"><strong>专业方向：</strong>油藏工程、钻井工程、采油工程、油气田开发</div>
-        <div class="skill-box"><strong>软件工具：</strong>Eclipse / CMG / Petrel / MATLAB / Python / Excel</div>
-        <div class="skill-box"><strong>数据分析：</strong>生产动态分析、参数拟合、图表可视化、技术报告</div>
-        <div class="skill-box"><strong>语言能力：</strong>中文母语，英语 CET-6 / IELTS / TOEFL（按实际填写）</div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-title">论文 / 证书 / 荣誉</div>
-      <ul>
-        <li>论文：填写论文题目、期刊 / 会议名称、作者顺序、发表时间。</li>
-        <li>证书：填写英语证书、计算机证书、专业软件培训证书等。</li>
-        <li>荣誉：填写奖学金、优秀学生、竞赛获奖等。</li>
-      </ul>
-    </section>
-
-    <section class="section">
-      <div class="section-title">自我评价</div>
-      <p>
-        具备扎实的石油工程专业基础和较强的学习能力，能够快速理解工程问题并进行系统分析。
-        做事认真负责，注重数据准确性和结果表达，具备良好的团队协作、沟通汇报和持续改进意识。
-      </p>
-    </section>
-
-    <div class="resume-footer">
-      <a href="/" class="back-link">← 返回首页</a>
-      <button class="print-btn" onclick="downloadResume()">下载简历</button>
-    </div>
-  </main>
-  </div>
-
-<script>
-  // 手机端按桌面 900px 版式整体缩放，呈现类似完整 PDF 页面的视角。
-  function fitResumeForViewport() {
-    const stage = document.querySelector('.resume-stage');
-    const resume = stage?.querySelector('.resume');
-    if (!stage || !resume) return;
-
-    if (window.matchMedia('(max-width: 700px)').matches) {
-      const desktopWidth = 900;
-      const scale = Math.min(1, stage.clientWidth / desktopWidth);
-      const left = Math.max(0, (stage.clientWidth - desktopWidth * scale) / 2);
-      resume.style.transform = `scale(${scale})`;
-      resume.style.left = `${left}px`;
-      stage.style.height = `${resume.offsetHeight * scale + 24}px`;
-    } else {
-      resume.style.removeProperty('transform');
-      resume.style.removeProperty('left');
-      stage.style.removeProperty('height');
-    }
-  }
-
-  window.addEventListener('resize', fitResumeForViewport);
-  window.addEventListener('DOMContentLoaded', fitResumeForViewport);
-
-  function downloadResume() {
-    const btn = document.querySelector('.print-btn');
-    btn.textContent = '生成中...';
-    btn.disabled = true;
-
-    const original = document.querySelector('.resume');
-    const clone = original.cloneNode(true);
-    const footer = clone.querySelector('.resume-footer');
-    if (footer) footer.remove();
-
-    // 为 A4 页面优化排版
-    clone.style.width = '190mm';
-    clone.style.padding = '0';
-    clone.style.margin = '0 auto';
-    clone.style.background = '#fff';
-    clone.style.color = '#222';
-    clone.style.fontSize = '11pt';
-    clone.style.lineHeight = '1.5';
-    clone.style.boxSizing = 'border-box';
-
-    // 防止关键元素跨页断裂
-    clone.querySelectorAll('.section, .item, .header, .skills, .skill-box').forEach(el => {
-      el.style.pageBreakInside = 'avoid';
-      el.style.breakInside = 'avoid';
-    });
-
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'absolute';
-    wrapper.style.left = '-9999px';
-    wrapper.style.top = '0';
-    wrapper.style.width = '210mm';
-    wrapper.style.background = '#fff';
-    document.body.appendChild(wrapper);
-    wrapper.appendChild(clone);
-
-    function cleanup() {
-      wrapper.remove();
-      btn.textContent = '下载简历';
-      btn.disabled = false;
+    function reportResumeHeight() {
+      if (window.parent === window) return;
+      const height = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight,
+        pageStage.getBoundingClientRect().bottom + window.scrollY
+      );
+      window.parent.postMessage({ type: 'resume-height', height: Math.ceil(height) }, window.location.origin);
     }
 
-    // 用 html2pdf 渲染 PDF（含自动分页）
-    const opt = {
-      margin:       [8, 12, 8, 12],
-      filename:     '简历.pdf',
-      image:        { type: 'jpeg', quality: 0.95 },
-      html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#fff', letterRendering: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:    { mode: ['css', 'legacy'] }
-    };
-    html2pdf().set(opt).from(clone).save().then(cleanup).catch(() => {
-      cleanup();
-      alert('PDF 生成失败');
-      window.print();
+    function fitPageToViewport() {
+      if (window.matchMedia('(max-width: 850px)').matches) {
+        const pageWidth = pageStack.offsetWidth;
+        const scale = Math.min(1, pageStage.clientWidth / pageWidth);
+        const left = Math.max(0, (pageStage.clientWidth - pageWidth * scale) / 2);
+        pageStack.style.transform = `scale(${scale})`;
+        pageStack.style.left = `${left}px`;
+        pageStage.style.height = `${pageStack.offsetHeight * scale}px`;
+      } else {
+        pageStack.style.removeProperty('transform');
+        pageStack.style.removeProperty('left');
+        pageStage.style.removeProperty('height');
+      }
+      window.requestAnimationFrame(reportResumeHeight);
+    }
+
+    window.addEventListener('resize', fitPageToViewport);
+    window.addEventListener('load', () => {
+      fitPageToViewport();
+      window.requestAnimationFrame(() => window.requestAnimationFrame(reportResumeHeight));
     });
-  }
-</script>
+  </script>
 </body>
 </html>

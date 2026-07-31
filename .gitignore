@@ -5,6 +5,7 @@ __pycache__/
 Thumbs.db
 .DS_Store
 .env
+backend/.resume_access_code
 .venv/
 venv/
 ssh.pem

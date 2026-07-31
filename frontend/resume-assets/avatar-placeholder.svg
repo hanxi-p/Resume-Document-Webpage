@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
+  <title id="title">头像占位图</title>
+  <desc id="desc">请替换为自己的头像</desc>
+  <rect width="200" height="200" rx="100" fill="#dbe7f2"/>
+  <circle cx="100" cy="75" r="38" fill="#6d88a3"/>
+  <path d="M38 184c5-42 28-64 62-64s57 22 62 64" fill="#6d88a3"/>
+</svg>

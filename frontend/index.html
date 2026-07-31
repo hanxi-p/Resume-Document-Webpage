@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>个人主页 | Portfolio</title>
-    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
     <!-- KaTeX for formula rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -584,7 +583,72 @@
         }
 
         /* ── 视图切换 ── */
-        #view-resume { display: none; width: 100%; }
+        [hidden] { display: none !important; }
+        #view-resume { display: none; width: 100%; position: relative; z-index: 1; }
+        #view-resume > .resume { display: none !important; }
+        .resume-frame {
+            display: block;
+            width: 100%;
+            min-height: 0;
+            height: 0;
+            border: 0;
+            background: transparent;
+        }
+        .resume-frame-footer {
+            position: absolute;
+            left: 50%;
+            bottom: 72px;
+            z-index: 3;
+            width: auto;
+            margin: 0;
+            transform: translateX(-50%);
+            justify-content: center;
+            gap: 0.75rem;
+            pointer-events: none;
+        }
+        .resume-access-gate {
+            min-height: calc(100vh - 8.5rem);
+            display: grid;
+            place-items: center;
+            padding: 2rem 1rem;
+        }
+        .resume-access-card {
+            width: min(92vw, 380px);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 18px;
+            background: rgba(13, 31, 49, 0.88);
+            box-shadow: 0 18px 52px rgba(0, 0, 0, 0.32);
+            backdrop-filter: blur(16px);
+            color: #fff;
+            text-align: center;
+        }
+        .resume-access-card h2 { margin: 0 0 0.5rem; font-size: 1.35rem; }
+        .resume-access-card p { margin: 0 0 1.2rem; color: rgba(255, 255, 255, 0.72); }
+        .resume-access-form { display: grid; gap: 0.8rem; }
+        .resume-access-form input {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.10);
+            color: #fff;
+            padding: 0.78rem 0.9rem;
+            font: inherit;
+            text-align: center;
+            letter-spacing: 0.14em;
+        }
+        .resume-access-form input::placeholder { color: rgba(255, 255, 255, 0.45); }
+        .resume-access-form button {
+            border: 0;
+            border-radius: 10px;
+            background: var(--accent);
+            color: #102238;
+            padding: 0.78rem 1rem;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .resume-access-status { min-height: 1.4em; margin: 0 !important; color: #ffd7d7 !important; font-size: 0.9rem; }
         .hero.resume-view {
             justify-content: center;
             align-items: flex-start;
@@ -664,6 +728,24 @@
         .print-btn:hover {
             color: #1f4e79;
         }
+        .resume-frame-footer .back-link,
+        .resume-frame-footer .print-btn {
+            pointer-events: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 0.55rem 1rem;
+            border: 1px solid rgba(31, 78, 121, 0.22);
+            border-radius: 999px;
+            box-shadow: 0 7px 20px rgba(31, 78, 121, 0.16);
+            font-size: 0.92rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .resume-frame-footer .back-link { background: rgba(255, 255, 255, 0.94); color: #1f4e79; }
+        .resume-frame-footer .print-btn { background: #1f4e79; color: #fff; }
+        .resume-frame-footer .print-btn:hover { color: #fff; background: #173c5e; }
         @media print { @page { margin: 15mm 18mm; } .navbar, .hero-bg, .profile-card, .print-btn, .back-link { display: none !important; } .resume { margin: 0; padding: 0; box-shadow: none; border-radius: 0; } .resume-footer { display: none !important; } .resume .section, .resume .item, .resume .header, .resume .skills, .resume .skill-box { page-break-inside: avoid; break-inside: avoid; } }
         @media (max-width: 700px) {
             .carousel-controls { display: none; }
@@ -681,6 +763,9 @@
                 width: 100%;
                 padding: 0;
             }
+            .resume-frame-footer { bottom: 38px; gap: 0.45rem; }
+            .resume-frame-footer .back-link,
+            .resume-frame-footer .print-btn { min-height: 32px; padding: 0.42rem 0.72rem; font-size: 0.78rem; }
             .hero.resume-view .resume {
                 width: 900px;
                 max-width: none;
@@ -813,6 +898,18 @@
 
         <!-- ── 简历视图（使用模板内容） ── -->
         <div class="view" id="view-resume">
+            <div id="resume-access-gate" class="resume-access-gate">
+                <div class="resume-access-card">
+                    <h2>简历访问验证</h2>
+                    <p>请输入访问密码后查看简历。</p>
+                    <form id="resume-access-form" class="resume-access-form">
+                        <input id="resume-access-password" type="password" inputmode="numeric" autocomplete="current-password" placeholder="访问密码" aria-label="简历访问密码">
+                        <button type="submit">查看简历</button>
+                        <p id="resume-access-status" class="resume-access-status" role="status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+            <iframe id="resume-frame" class="resume-frame" src="about:blank" title="示例简历" hidden></iframe>
             <main class="resume">
                 <header class="header">
                     <h1 class="name">姓名</h1>
@@ -926,6 +1023,10 @@
                     <button class="print-btn" onclick="downloadResume()">下载简历</button>
                 </div>
             </main>
+            <div id="resume-frame-footer" class="resume-footer resume-frame-footer" hidden>
+                <a href="#" class="back-link" data-view="home">← 返回首页</a>
+                <button class="print-btn" onclick="printResume()">打印简历</button>
+            </div>
         </div>
 
         <div class="icp-footer">&copy; 2026 YOUR NAME</div>
@@ -1125,7 +1226,6 @@
             const carousel = document.getElementById('hero-carousel');
             const slides = [...carousel.querySelectorAll('.carousel-slide')];
             const dots = [...document.querySelectorAll('.carousel-dot')];
-            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
             let current = 0;
             let timer = null;
 
@@ -1140,27 +1240,119 @@
             }
 
             function stopCarousel() {
-                if (timer) window.clearInterval(timer);
+                if (timer !== null) window.clearTimeout(timer);
                 timer = null;
             }
 
             function startCarousel() {
                 stopCarousel();
-                if (!reduceMotion.matches && !document.hidden) {
-                    timer = window.setInterval(() => showSlide(current + 1), 5000);
-                }
+                if (document.hidden) return;
+                timer = window.setTimeout(() => {
+                    showSlide(current + 1);
+                    startCarousel();
+                }, 5000);
             }
 
             dots.forEach(dot => dot.addEventListener('click', () => {
                 showSlide(Number(dot.dataset.slideTo));
                 startCarousel();
             }));
-            carousel.addEventListener('mouseenter', stopCarousel);
-            carousel.addEventListener('mouseleave', startCarousel);
-            document.addEventListener('visibilitychange', startCarousel);
-            reduceMotion.addEventListener?.('change', startCarousel);
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) stopCarousel();
+                else startCarousel();
+            });
             startCarousel();
         })();
+
+        // ── 简历服务器端访问验证与原生两页 A4 打印 ──
+        const resumeFrame = document.getElementById('resume-frame');
+        const resumeAccessGate = document.getElementById('resume-access-gate');
+        const resumeAccessForm = document.getElementById('resume-access-form');
+        const resumeAccessPassword = document.getElementById('resume-access-password');
+        const resumeAccessStatus = document.getElementById('resume-access-status');
+        const resumeFrameFooter = document.getElementById('resume-frame-footer');
+        let resumeUnlocked = false;
+
+        function syncResumeFrameHeight() {
+            if (!resumeFrame?.contentDocument) return;
+            const frameDocument = resumeFrame.contentDocument;
+            const height = Math.max(
+                frameDocument.documentElement?.scrollHeight || 0,
+                frameDocument.body?.scrollHeight || 0
+            );
+            if (height) resumeFrame.style.height = `${height}px`;
+        }
+
+        function showUnlockedResume() {
+            resumeUnlocked = true;
+            resumeAccessGate.hidden = true;
+            resumeFrame.hidden = false;
+            resumeFrameFooter.hidden = false;
+            if (!resumeFrame.src || resumeFrame.src === 'about:blank') {
+                resumeFrame.src = `jianli.html?v=${Date.now()}`;
+            }
+        }
+
+        async function prepareResumeAccess() {
+            if (resumeUnlocked) return;
+            try {
+                const response = await fetch('/api/resume-auth', { credentials: 'same-origin' });
+                if (response.ok) {
+                    showUnlockedResume();
+                    return;
+                }
+            } catch (_) { /* 保留密码输入界面 */ }
+            resumeAccessGate.hidden = false;
+            resumeFrame.hidden = true;
+            resumeFrameFooter.hidden = true;
+            window.requestAnimationFrame(() => resumeAccessPassword?.focus());
+        }
+
+        resumeAccessForm?.addEventListener('submit', async event => {
+            event.preventDefault();
+            const password = resumeAccessPassword.value.trim();
+            if (!password) return;
+            resumeAccessStatus.textContent = '正在验证…';
+            try {
+                const response = await fetch('/api/resume-auth', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                if (!response.ok) {
+                    const payload = await response.json().catch(() => ({}));
+                    resumeAccessStatus.textContent = payload.detail || '密码错误，请重试';
+                    resumeAccessPassword.select();
+                    return;
+                }
+                resumeAccessStatus.textContent = '';
+                resumeAccessPassword.value = '';
+                showUnlockedResume();
+            } catch (_) {
+                resumeAccessStatus.textContent = '暂时无法验证，请稍后重试';
+            }
+        });
+
+        function printResume() {
+            if (!resumeFrame?.contentWindow) return;
+            resumeFrame.contentWindow.focus();
+            resumeFrame.contentWindow.print();
+        }
+
+        resumeFrame?.addEventListener('load', () => {
+            window.requestAnimationFrame(() => {
+                syncResumeFrameHeight();
+                window.requestAnimationFrame(syncResumeFrameHeight);
+            });
+        });
+
+        window.addEventListener('message', event => {
+            if (event.origin !== window.location.origin || event.source !== resumeFrame?.contentWindow) return;
+            if (event.data?.type === 'resume-height' && Number.isFinite(event.data.height)) {
+                resumeFrame.style.height = `${Math.max(1, event.data.height)}px`;
+            }
+        });
 
         // ── 视图切换 (首页 / 简历) ──
         function switchView(viewName) {
@@ -1172,28 +1364,14 @@
             });
             // 切回首页时显示导航栏
             if (viewName === 'home') document.querySelector('.navbar').classList.remove('hidden');
+            if (viewName === 'resume') prepareResumeAccess();
             window.requestAnimationFrame(fitResumeForViewport);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 手机端按桌面 900px 版式整体缩放，呈现类似完整 PDF 页面的视角。
+        // 简历文档自行负责桌面/手机缩放；主页只同步 iframe 高度。
         function fitResumeForViewport() {
-            const stage = document.getElementById('view-resume');
-            const resume = stage?.querySelector('.resume');
-            if (!stage || !resume) return;
-
-            if (window.matchMedia('(max-width: 700px)').matches && document.querySelector('.hero').classList.contains('resume-view')) {
-                const desktopWidth = 900;
-                const scale = Math.min(1, stage.clientWidth / desktopWidth);
-                const left = Math.max(0, (stage.clientWidth - desktopWidth * scale) / 2);
-                resume.style.transform = `scale(${scale})`;
-                resume.style.left = `${left}px`;
-                stage.style.height = `${resume.offsetHeight * scale + 32}px`;
-            } else {
-                resume.style.removeProperty('transform');
-                resume.style.removeProperty('left');
-                stage.style.removeProperty('height');
-            }
+            syncResumeFrameHeight();
         }
 
         window.addEventListener('resize', fitResumeForViewport);

@@ -1,7 +1,12 @@
 from pathlib import Path
-from fastapi import FastAPI
-from fastapi.responses import FileResponse, HTMLResponse
+import hmac
+import os
+import secrets
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 import uvicorn
 
 app = FastAPI(title="Resume Portfolio Template")
@@ -10,11 +15,34 @@ app = FastAPI(title="Resume Portfolio Template")
 BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = BASE_DIR / "frontend"
 STATIC_DIR = FRONTEND_DIR / "static"
+RESUME_ASSETS_DIR = FRONTEND_DIR / "resume-assets"
 SCRIPTS_DIR = BASE_DIR / "scripts"
+RESUME_CODE_FILE = Path(__file__).resolve().parent / ".resume_access_code"
+RESUME_COOKIE = "resume_access"
+RESUME_SESSION_TOKEN = secrets.token_urlsafe(32)
 
 # Serve static files
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+class ResumeAccessRequest(BaseModel):
+    password: str
+
+
+def get_resume_access_code() -> str:
+    """Read the private resume password without storing it in source control."""
+    code = os.getenv("RESUME_ACCESS_CODE", "").strip()
+    if code:
+        return code
+    if RESUME_CODE_FILE.exists():
+        return RESUME_CODE_FILE.read_text(encoding="utf-8").strip()
+    return ""
+
+
+def has_resume_access(request: Request) -> bool:
+    supplied = request.cookies.get(RESUME_COOKIE, "")
+    return bool(supplied) and hmac.compare_digest(supplied, RESUME_SESSION_TOKEN)
 
 
 # ─── Front Page ───────────────────────────────────────────
@@ -27,12 +55,52 @@ async def root():
 
 
 # ─── Resume ──────────────────────────────────────────────
+@app.get("/api/resume-auth")
+async def resume_auth_status(request: Request):
+    if not has_resume_access(request):
+        raise HTTPException(status_code=401, detail="需要验证")
+    return {"ok": True}
+
+
+@app.post("/api/resume-auth")
+async def resume_auth(payload: ResumeAccessRequest):
+    expected = get_resume_access_code()
+    if not expected:
+        raise HTTPException(status_code=503, detail="简历访问密码尚未配置")
+    if not hmac.compare_digest(payload.password.strip(), expected):
+        raise HTTPException(status_code=401, detail="密码错误")
+
+    response = JSONResponse({"ok": True})
+    response.set_cookie(
+        key=RESUME_COOKIE,
+        value=RESUME_SESSION_TOKEN,
+        max_age=8 * 60 * 60,
+        httponly=True,
+        samesite="strict",
+        secure=False,
+    )
+    return response
+
+
 @app.get("/jianli.html", response_class=HTMLResponse)
-async def jianli():
+async def jianli(request: Request):
+    if not has_resume_access(request):
+        raise HTTPException(status_code=401, detail="请先验证简历访问密码")
     html_path = FRONTEND_DIR / "jianli.html"
     if not html_path.exists():
         return HTMLResponse("<h1>简历正在准备中...</h1>")
     return HTMLResponse(html_path.read_text(encoding="utf-8"))
+
+
+@app.get("/resume-assets/{filename:path}")
+async def resume_asset(filename: str, request: Request):
+    if not has_resume_access(request):
+        raise HTTPException(status_code=401, detail="请先验证简历访问密码")
+    root = RESUME_ASSETS_DIR.resolve()
+    asset_path = (root / filename).resolve()
+    if root not in asset_path.parents or not asset_path.is_file():
+        raise HTTPException(status_code=404, detail="资源不存在")
+    return FileResponse(asset_path)
 
 
 # ─── 技术专题页 (通配路由) ────────────────────────────
